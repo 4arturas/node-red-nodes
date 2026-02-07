@@ -1,0 +1,37 @@
+<script type="text/javascript">
+    RED.nodes.registerType('chat-ollama', {
+        category: 'function',
+        color: '#f3a011',
+        defaults: {
+            name: { value: "" },
+            baseUrl: { value: "http://localhost:11434" },
+            modelName: { value: "qwen2.5:7b" },
+            temperature: { value: 0 }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-commenting-o",
+        label: function() {
+            return this.name || this.modelName || "ChatOllama";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="chat-ollama">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-baseUrl"><i class="fa fa-globe"></i> Base URL</label>
+        <input type="text" id="node-input-baseUrl" placeholder="http://localhost:11434">
+    </div>
+    <div class="form-row">
+        <label for="node-input-modelName"><i class="fa fa-cube"></i> Model</label>
+        <input type="text" id="node-input-modelName" placeholder="qwen2.5:7b">
+    </div>
+    <div class="form-row">
+        <label for="node-input-temperature"><i class="fa fa-thermometer-half"></i> Temp</label>
+        <input type="number" step="0.1" id="node-input-temperature">
+    </div>
+</script>
