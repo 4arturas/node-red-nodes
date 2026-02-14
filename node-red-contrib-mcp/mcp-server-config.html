@@ -1,0 +1,42 @@
+<script type="text/javascript">
+    RED.nodes.registerType('mcp-server-config', {
+        category: 'config',
+        defaults: {
+            name: { value: "" },
+            command: { value: "node", required: true },
+            serverArgs: { value: "", required: false }
+        },
+        label: function () {
+            return this.name || "mcp server config";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="mcp-server-config">
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+        <label for="node-config-input-command"><i class="fa fa-terminal"></i> Command</label>
+        <input type="text" id="node-config-input-command" list="mcp-commands" placeholder="node, npx, uvx...">
+        <datalist id="mcp-commands">
+            <option value="node">
+            <option value="npx">
+            <option value="uvx">
+            <option value="python">
+            <option value="python3">
+        </datalist>
+    </div>
+
+    <div class="form-row">
+        <label for="node-config-input-serverArgs"><i class="fa fa-cogs"></i> Server Args</label>
+        <input type="text" id="node-config-input-serverArgs" placeholder="Arguments and paths">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="mcp-server-config">
+    <p>A configuration node that maintains a persistent connection to an MCP server.</p>
+    <p>This allows multiple nodes to share the same session, which is necessary for tools like Playwright where state (like an open browser) needs to be maintained between calls.</p>
+</script>
