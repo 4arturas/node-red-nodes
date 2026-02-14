@@ -18,7 +18,8 @@
   "node-red": {
     "nodes": {
       "mcp-call-tool": "mcp-call.js",
-      "mcp-list-tools": "mcp-list.js"
+      "mcp-list-tools": "mcp-list.js",
+      "mcp-server-config": "mcp-server-config.js"
     }
   },
   "dependencies": {

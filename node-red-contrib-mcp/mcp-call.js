@@ -6,26 +6,35 @@ module.exports = function (RED) {
         RED.nodes.createNode(this, config);
         const node = this;
 
+        node.server = RED.nodes.getNode(config.server);
+
         node.on('input', async function (msg, send, done) {
             node.status({ fill: "blue", shape: "dot", text: "connecting..." });
 
-            const command = msg.command || config.command || 'npx';
-            const serverArgsRaw = msg.serverArgs || config.serverArgs || '';
-
-            const args = serverArgsRaw ? serverArgsRaw.split(' ').filter(arg => arg.trim() !== "") : [];
-
-            const transport = new StdioClientTransport({
-                command: command,
-                args: args
-            });
-
-            const client = new Client(
-                { name: 'mcp-call-client', version: '1.0.0' },
-                { capabilities: {} }
-            );
+            let client;
+            let transport;
+            const isPersistent = !!node.server;
 
             try {
-                await client.connect(transport);
+                if (isPersistent) {
+                    client = await node.server.connect();
+                } else {
+                    const command = msg.command || config.command || 'npx';
+                    const serverArgsRaw = msg.serverArgs || config.serverArgs || '';
+                    const args = serverArgsRaw ? serverArgsRaw.split(' ').filter(arg => arg.trim() !== "") : [];
+
+                    transport = new StdioClientTransport({
+                        command: command,
+                        args: args
+                    });
+
+                    client = new Client(
+                        { name: 'mcp-call-client', version: '1.0.0' },
+                        { capabilities: {} }
+                    );
+
+                    await client.connect(transport);
+                }
 
                 const toolName = msg.payload?.name;
                 const toolArgs = msg.payload?.arguments || {};
@@ -54,10 +63,12 @@ module.exports = function (RED) {
                 node.status({ fill: "red", shape: "ring", text: "error" });
                 node.error(error.message || error, msg);
             } finally {
-                try {
-                    if (client.transport) await client.close();
-                } catch (e) {
-                    // Silent cleanup
+                if (!isPersistent) {
+                    try {
+                        if (client && client.transport) await client.close();
+                    } catch (e) {
+                        // Silent cleanup
+                    }
                 }
             }
             if (done) done();
