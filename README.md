@@ -30,6 +30,8 @@ npm install /path/to/node-red-contrib-mcp
 
 ### Windows
 ```bash
-cd C:\Users\4artu\.node-red
-npm install C:\Users\4artu\IdeaProjects\node-red-nodes\node-red-contrib-mcp
+cd C:/Users/4artu/.node-red
+```
+```bash
+npm install C:/Users/4artu/IdeaProjects/node-red-nodes/node-red-contrib-mcp
 ```

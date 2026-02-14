@@ -1,0 +1,45 @@
+<script type="text/javascript">
+    RED.nodes.registerType('mcp-list-tools', {
+        category: 'function',
+        color: '#dbf0ff',
+        defaults: {
+            name: { value: "" },
+            command: { value: "npx" },
+            serverArgs: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-list",
+        paletteLabel: "mcp list tools",
+        label: function() {
+            return this.name || "mcp list tools";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="mcp-list-tools">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-command"><i class="fa fa-terminal"></i> Command</label>
+        <select id="node-input-command">
+            <option value="npx">npx</option>
+            <option value="node">node</option>
+            <option value="python">python</option>
+            <option value="python3">python3</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-serverArgs"><i class="fa fa-cogs"></i> Server Args</label>
+        <input type="text" id="node-input-serverArgs" placeholder="e.g. @modelcontextprotocol/server-filesystem C:/U1">
+    </div>
+
+    <div class="form-tips">
+        <p>Connects to an MCP server and outputs an array of all available tools.</p>
+        <p><b>Output:</b> <code>msg.payload</code> contains the list of tools and their JSON schemas.</p>
+    </div>
+</script>
