@@ -4,16 +4,8 @@ Model Context Protocol (MCP) node for Node-RED. This node allows Node-RED flows 
 
 ## Installation
 
-### Linux
 ```bash
-cd ~/.node-red
-npm install /path/to/node-red-contrib-mcp
-```
-
-### Windows
-```bash
-cd C:/Users/4artu/.node-red
-npm install C:\path\to\node-red-contrib-mcp
+npm install C:/Users/4artu/IdeaProjects/node-red-nodes/node-red-contrib-mcp
 ```
 
 ```sh

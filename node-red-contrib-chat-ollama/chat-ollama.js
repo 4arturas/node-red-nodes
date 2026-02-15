@@ -16,7 +16,6 @@ module.exports = function(RED) {
             node.status({fill:"blue", shape:"dot", text:"thinking..."});
 
             try {
-                // If msg.payload is a string, wrap it. If it's already an array of messages, pass it through.
                 const input = Array.isArray(msg.payload) ? msg.payload : [["user", msg.payload]];
 
                 const response = await model.invoke(input);
