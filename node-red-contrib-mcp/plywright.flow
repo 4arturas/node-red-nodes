@@ -1,0 +1,189 @@
+[
+    {
+        "id": "203a5df7a09b4976",
+        "type": "inject",
+        "z": "f6f2187d.0963d8",
+        "name": "Start Search",
+        "props": [
+            {
+                "p": "query",
+                "v": "what is the capital of Lithuania?",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 370,
+        "y": 560,
+        "wires": [
+            [
+                "966faa911ba57f4f"
+            ]
+        ]
+    },
+    {
+        "id": "966faa911ba57f4f",
+        "type": "template",
+        "z": "f6f2187d.0963d8",
+        "name": "Prep Direct Search",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n    \"name\": \"browser_navigate\",\n    \"arguments\": {\n        \"url_\": \"https://www.mojeek.com/search?q={{query}}\",\n        \"url\": \"https://zed.dev/\"\n    }\n}",
+        "output": "json",
+        "x": 570,
+        "y": 560,
+        "wires": [
+            [
+                "8c704547e39ce726"
+            ]
+        ]
+    },
+    {
+        "id": "8c704547e39ce726",
+        "type": "mcp-call-tool",
+        "z": "f6f2187d.0963d8",
+        "name": "Navigate",
+        "server": "9f14e4bb10bf7bbd",
+        "x": 750,
+        "y": 560,
+        "wires": [
+            [
+                "6d267f5a820bec5f"
+            ]
+        ]
+    },
+    {
+        "id": "6d267f5a820bec5f",
+        "type": "template",
+        "z": "f6f2187d.0963d8",
+        "name": "Prep Wait",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n    \"name\": \"browser_wait_for\",\n    \"arguments\": {\n        \"time\": 2\n    }\n}",
+        "output": "json",
+        "x": 910,
+        "y": 560,
+        "wires": [
+            [
+                "bf05b72f8da5e6b7"
+            ]
+        ]
+    },
+    {
+        "id": "bf05b72f8da5e6b7",
+        "type": "mcp-call-tool",
+        "z": "f6f2187d.0963d8",
+        "name": "Wait",
+        "server": "9f14e4bb10bf7bbd",
+        "x": 1050,
+        "y": 560,
+        "wires": [
+            [
+                "c03181122409d332"
+            ]
+        ]
+    },
+    {
+        "id": "c03181122409d332",
+        "type": "template",
+        "z": "f6f2187d.0963d8",
+        "name": "Prep Screenshot",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n    \"name\": \"browser_take_screenshot\",\n    \"arguments\": {\n        \"filename\": \"C:/Users/4artu/IdeaProjects/node-red-nodes/node-red-contrib-mcp/test.png\"\n    }\n}",
+        "output": "json",
+        "x": 1210,
+        "y": 560,
+        "wires": [
+            [
+                "33ead79658e69661"
+            ]
+        ]
+    },
+    {
+        "id": "33ead79658e69661",
+        "type": "mcp-call-tool",
+        "z": "f6f2187d.0963d8",
+        "name": "Screenshot",
+        "server": "9f14e4bb10bf7bbd",
+        "x": 370,
+        "y": 640,
+        "wires": [
+            [
+                "a52d116b61a505eb"
+            ]
+        ]
+    },
+    {
+        "id": "a52d116b61a505eb",
+        "type": "template",
+        "z": "f6f2187d.0963d8",
+        "name": "Prep Close",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n    \"name\": \"browser_close\",\n    \"arguments\": {}\n}",
+        "output": "json",
+        "x": 530,
+        "y": 640,
+        "wires": [
+            [
+                "19aab7ab9ad2a2b2"
+            ]
+        ]
+    },
+    {
+        "id": "19aab7ab9ad2a2b2",
+        "type": "mcp-call-tool",
+        "z": "f6f2187d.0963d8",
+        "name": "Close",
+        "server": "9f14e4bb10bf7bbd",
+        "serverArgs": "",
+        "x": 670,
+        "y": 640,
+        "wires": [
+            [
+                "7d6ac32251043869"
+            ]
+        ]
+    },
+    {
+        "id": "7d6ac32251043869",
+        "type": "debug",
+        "z": "f6f2187d.0963d8",
+        "name": "Finish",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 810,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "9f14e4bb10bf7bbd",
+        "type": "mcp-server-config",
+        "name": "",
+        "command": "node",
+        "serverArgs": "C:\\Users\\4artu\\IdeaProjects\\node-red-nodes\\node-red-contrib-mcp\\node_modules\\@playwright\\mcp\\cli.js"
+    },
+    {
+        "id": "ecd5aa53fc95b51e",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-mcp": "1.0.0"
+        }
+    }
+]

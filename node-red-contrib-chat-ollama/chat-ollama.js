@@ -5,7 +5,6 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, config);
         const node = this;
 
-        // Initialize the model once when the node is deployed
         const model = new ChatOllama({
             baseUrl: config.baseUrl,
             model: config.modelName,
@@ -22,7 +21,7 @@ module.exports = function(RED) {
 
                 // Set the output
                 msg.payload = response.content;
-                msg.rawResponse = response; // Optional: keep metadata
+                msg.rawResponse = response;
 
                 node.status({fill:"green", shape:"dot", text:"done"});
                 node.send(msg);

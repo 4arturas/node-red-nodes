@@ -33,6 +33,7 @@ module.exports = function (RED) {
                         { capabilities: {} }
                     );
 
+                    client.transport = transport;
                     await client.connect(transport);
                 }
 
@@ -49,7 +50,7 @@ module.exports = function (RED) {
             } finally {
                 if (!isPersistent) {
                     try {
-                        if (client && client.transport) await client.close();
+                        if (client) await client.close();
                     } catch (e) {
                         // Silent cleanup
                     }
