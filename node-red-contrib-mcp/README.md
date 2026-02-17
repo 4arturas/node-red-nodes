@@ -16,6 +16,8 @@ node C:/Users/4artu/IdeaProjects/node-red-nodes/node-red-contrib-mcp/node_module
 node C:/Users/4artu/IdeaProjects/node-red-nodes/node-red-contrib-mcp/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js C:/tmp
 ````
 
+node-red-contrib-loop-processing
+
 Dockling
 --- TOOLS FOUND ---
 Name: is_document_in_local_cache

@@ -1,0 +1,101 @@
+[
+    {
+        "id": "8d82c138360c691d",
+        "type": "inject",
+        "z": "f6f2187d.0963d8",
+        "name": "Inject Tool Array",
+        "props": [
+            {
+                "p": "toolArray",
+                "v": "[\n    {\"name\": \"browser_navigate\", \"arguments\": {\"url\": \"https://nodered.org/\"}},\n    {\"name\": \"browser_wait_for\", \"arguments\": {\"time\": 2}},\n    {\"name\": \"browser_take_screenshot\", \"arguments\": {\"filename\": \"C:/Users/4artu/IdeaProjects/node-red-nodes/node-red-contrib-mcp/test.png\"}},\n    {\"name\": \"browser_close\", \"arguments\": {}}\n]",
+                "vt": "json"
+            },
+            {
+                "p": "toolResults",
+                "v": "[]",
+                "vt": "json"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 480,
+        "y": 1180,
+        "wires": [
+            [
+                "a8ddf3cfb845017b"
+            ]
+        ]
+    },
+    {
+        "id": "a8ddf3cfb845017b",
+        "type": "array-loop",
+        "z": "f6f2187d.0963d8",
+        "name": "Loop Through Tools",
+        "key": "toolIndex",
+        "keyType": "msg",
+        "reset": false,
+        "resetValue": "value-null",
+        "array": "toolArray",
+        "arrayType": "msg",
+        "x": 700,
+        "y": 1260,
+        "wires": [
+            [
+                "01f9b03126355aa9"
+            ],
+            [
+                "bb3fd51c7990828d"
+            ]
+        ]
+    },
+    {
+        "id": "bb3fd51c7990828d",
+        "type": "mcp-call-tool",
+        "z": "f6f2187d.0963d8",
+        "name": "MCP Browser Call",
+        "server": "9f14e4bb10bf7bbd",
+        "x": 710,
+        "y": 1380,
+        "wires": [
+            [
+                "a8ddf3cfb845017b"
+            ]
+        ]
+    },
+    {
+        "id": "01f9b03126355aa9",
+        "type": "debug",
+        "z": "f6f2187d.0963d8",
+        "name": "Final Results",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "toolResults",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 920,
+        "y": 1200,
+        "wires": []
+    },
+    {
+        "id": "9f14e4bb10bf7bbd",
+        "type": "mcp-server-config",
+        "name": "",
+        "command": "node",
+        "serverArgs": "C:\\Users\\4artu\\IdeaProjects\\node-red-nodes\\node-red-contrib-mcp\\node_modules\\@playwright\\mcp\\cli.js"
+    },
+    {
+        "id": "e844271a6a2ddca3",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-loop-processing": "0.5.1",
+            "node-red-contrib-mcp": "1.0.0"
+        }
+    }
+]
