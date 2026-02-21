@@ -1,37 +1,68 @@
+# node-red-contrib-chat-ollama
 
-```sh
-npm i
-````
+Chat with Ollama models in Node-RED using LangChain's ChatOllama.
 
-Windows
-```sh
-cd C:\Users\4artu\.node-red
-````
-```sh
-npm install C:\Users\4artu\IdeaProjects\node-red-nodes\node-red-contrib-chat-ollama
-````
+## Installation
+
+```bash
+cd ~/.node-red
+npm install /path/to/node-red-contrib-chat-ollama
+```
+
+### Windows
+
+```bash
+cd C:/Users/4artu/.node-red
+npm install C:/Users/4artu/IdeaProjects/node-red-nodes/node-red-contrib-chat-ollama
+```
+
+## Usage
+
+Sends messages to Ollama and returns AI responses.
+
+### Configuration
+
+| Property | Description | Default |
+|----------|-------------|---------|
+| **Base URL** | Ollama server URL | `http://localhost:11434` |
+| **Model Name** | Ollama model (e.g., `qwen2.5:7b`, `llama3.1`) | `llama3.1` |
+| **Temperature** | Response creativity (0-1) | `0.7` |
+
+## Input
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `msg.payload` | string\|array | Message text or conversation array |
+
+### Conversation Format
 
 ```json
-{
-  "model": "llama3.1",
-  "messages": [
-    { "role": "user", "content": "What is the weather in SF?" },
-    { 
-      "role": "assistant", 
-      "tool_calls": [
-        {
-          "id": "call_abc123",
-          "type": "function",
-          "function": { "name": "get_weather", "arguments": "{\"location\": \"San Francisco, CA\"}" }
-        }
-      ]
-    },
-    { 
-      "role": "tool", 
-      "content": "Sunny, 72°F", 
-      "tool_call_id": "call_abc123" 
-    }
-  ],
-  "stream": false
-}
-````
+[
+  ["system", "You are a helpful assistant."],
+  ["user", "Hello!"],
+  ["assistant", "Hi! How can I help?"]
+]
+```
+
+## Output
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `msg.payload` | string | AI response content |
+| `msg.rawResponse` | object | Full response object |
+
+## Example
+
+```
+[Inject: "What is the weather in SF?"] → [ChatOllama] → [Debug]
+```
+
+## Prerequisites
+
+1. Install Ollama from [https://ollama.ai](https://ollama.ai)
+2. Pull a model: `ollama pull qwen2.5:7b`
+3. Start Ollama: `ollama serve`
+
+## License
+
+MIT

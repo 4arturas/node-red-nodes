@@ -1,0 +1,104 @@
+<script type="text/javascript">
+    RED.nodes.registerType('text-splitter', {
+        category: 'rag',
+        color: '#E6E0F8',
+        defaults: {
+            name: { value: "" },
+            chunkSize: { value: 1000, required: true, validate: RED.validators.number() },
+            chunkOverlap: { value: 100, required: true, validate: RED.validators.number() },
+            separator: { value: "\n\n|\n| |" },
+            outputFormat: { value: "array", required: true }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-scissors",
+        label: function() {
+            return this.name || "text-splitter";
+        },
+        labelStyle: function() {
+            return this.name ? "node_label_italic" : "";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="text-splitter">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-chunkSize"><i class="fa fa-arrows-h"></i> Chunk Size</label>
+        <input type="number" id="node-input-chunkSize" placeholder="1000" min="100" max="10000">
+    </div>
+    <div class="form-row">
+        <label for="node-input-chunkOverlap"><i class="fa fa-arrows-alt"></i> Chunk Overlap</label>
+        <input type="number" id="node-input-chunkOverlap" placeholder="100" min="0" max="1000">
+    </div>
+    <div class="form-row">
+        <label for="node-input-separator"><i class="fa fa-chain"></i> Separators</label>
+        <input type="text" id="node-input-separator" placeholder="\n\n|\n| |" value="\n\n|\n| |">
+        <div style="font-size: 0.8em; color: #666; margin-top: 5px;">
+            Use <code>|</code> to separate multiple separators. Default: <code>\n\n|\n| |</code>
+        </div>
+    </div>
+    <div class="form-row">
+        <label for="node-input-outputFormat"><i class="fa fa-outdent"></i> Output</label>
+        <select id="node-input-outputFormat" style="width: 70%;">
+            <option value="array">Array of chunks</option>
+            <option value="single">First chunk only</option>
+        </select>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="text-splitter">
+    <p>Splits text into smaller chunks using recursive character splitting. Ideal for preparing documents for RAG indexing.</p>
+    
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">string</span></dt>
+        <dd>Text content to split into chunks</dd>
+    </dl>
+    
+    <h3>Properties</h3>
+    <dl class="message-properties">
+        <dt>Chunk Size <span class="property-type">number</span></dt>
+        <dd>Maximum size of each chunk (default: 1000 characters)</dd>
+        
+        <dt>Chunk Overlap <span class="property-type">number</span></dt>
+        <dd>Number of characters to overlap between chunks (default: 100)</dd>
+        
+        <dt>Separators <span class="property-type">string</span></dt>
+        <dd>Characters to use as separators, separated by <code>|</code>. 
+            The splitter tries separators in order until chunks fit the size limit.
+            Default: <code>\n\n|\n| |</code> (paragraphs, lines, words, characters)
+        </dd>
+        
+        <dt>Output <span class="property-type">string</span></dt>
+        <dd>Output format:
+            <ul>
+                <li><code>Array of chunks</code> - All chunks in msg.payload array</li>
+                <li><code>First chunk only</code> - First chunk in msg.payload, all in msg.chunks</li>
+            </ul>
+        </dd>
+    </dl>
+    
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">array|string</span></dt>
+        <dd>Array of text chunks or single chunk based on output format</dd>
+        <dt class="optional">chunkCount <span class="property-type">number</span></dt>
+        <dd>Number of chunks created</dd>
+        <dt class="optional">chunks <span class="property-type">array</span></dt>
+        <dd>All chunks (when output format is "single")</dd>
+    </dl>
+    
+    <h3>Example</h3>
+    <p>Split a document for RAG indexing:</p>
+    <ul>
+        <li>Chunk Size: <code>1000</code></li>
+        <li>Chunk Overlap: <code>100</code></li>
+        <li>Separators: <code>\n\n|\n| |</code></li>
+        <li>Output: <code>Array of chunks</code></li>
+    </ul>
+    <p>Then iterate over chunks using a split node for embedding generation.</p>
+</script>

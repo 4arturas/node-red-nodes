@@ -1,0 +1,29 @@
+{
+  "name": "node-red-contrib-text-splitter",
+  "version": "1.0.0",
+  "description": "A Node-RED node to split text into chunks for RAG indexing",
+  "main": "text-splitter.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "node-red",
+    "text-splitter",
+    "rag",
+    "chunking",
+    "langchain"
+  ],
+  "node-red": {
+    "nodes": {
+      "text-splitter": "text-splitter.js"
+    }
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@langchain/textsplitters": "^0.1.0"
+  },
+  "devDependencies": {
+    "node-red": "^4.1.5"
+  }
+}

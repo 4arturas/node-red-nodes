@@ -1,0 +1,127 @@
+<script type="text/javascript">
+    RED.nodes.registerType('cheerio', {
+        category: 'rag',
+        color: '#E6E0F8',
+        defaults: {
+            name: { value: "" },
+            selector: { value: "", required: false },
+            attribute: { value: "text", required: true },
+            attributeName: { value: "href", required: false },
+            outputFormat: { value: "string", required: true }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-html5",
+        label: function() {
+            return this.name || "cheerio";
+        },
+        labelStyle: function() {
+            return this.name ? "node_label_italic" : "";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="cheerio">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-selector"><i class="fa fa-crosshairs"></i> Selector</label>
+        <input type="text" id="node-input-selector" placeholder="e.g., .class, #id, tag">
+    </div>
+    <div class="form-row">
+        <label for="node-input-attribute"><i class="fa fa-list"></i> Attribute</label>
+        <select id="node-input-attribute" style="width: 70%;">
+            <option value="text">text() - Get text content</option>
+            <option value="html">html() - Get inner HTML</option>
+            <option value="attr">attr() - Get attribute value</option>
+            <option value="val">val() - Get input value</option>
+        </select>
+    </div>
+    <div class="form-row" id="attributeNameRow">
+        <label for="node-input-attributeName"><i class="fa fa-font"></i> Attr Name</label>
+        <input type="text" id="node-input-attributeName" placeholder="e.g., href, src">
+    </div>
+    <div class="form-row">
+        <label for="node-input-outputFormat"><i class="fa fa-outdent"></i> Output</label>
+        <select id="node-input-outputFormat" style="width: 70%;">
+            <option value="string">Single string</option>
+            <option value="array">Array of values</option>
+        </select>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="cheerio">
+    <p>Parses HTML content using Cheerio and extracts data based on CSS selectors.</p>
+    
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">string</span></dt>
+        <dd>HTML content to parse</dd>
+    </dl>
+    
+    <h3>Properties</h3>
+    <dl class="message-properties">
+        <dt>Selector <span class="property-type">CSS Selector</span></dt>
+        <dd>CSS selector to find elements (e.g., <code>.class</code>, <code>#id</code>, <code>tag</code>). Leave empty to get entire body HTML.</dd>
+        
+        <dt>Attribute <span class="property-type">string</span></dt>
+        <dd>What to extract from matched elements:
+            <ul>
+                <li><code>text()</code> - Get text content</li>
+                <li><code>html()</code> - Get inner HTML</li>
+                <li><code>attr()</code> - Get attribute value (specify name below)</li>
+                <li><code>val()</code> - Get input element value</li>
+            </ul>
+        </dd>
+        
+        <dt>Attr Name <span class="property-type">string</span></dt>
+        <dd>Attribute name when using attr() (e.g., <code>href</code>, <code>src</code>, <code>data-id</code>)</dd>
+        
+        <dt>Output <span class="property-type">string</span></dt>
+        <dd>Output format:
+            <ul>
+                <li><code>Single string</code> - Combined result</li>
+                <li><code>Array of values</code> - Array with value from each matched element</li>
+            </ul>
+        </dd>
+    </dl>
+    
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">string|array</span></dt>
+        <dd>Extracted data based on your configuration</dd>
+    </dl>
+    
+    <h3>Example</h3>
+    <p>Extract all links from a page:</p>
+    <ul>
+        <li>Selector: <code>a</code></li>
+        <li>Attribute: <code>attr()</code></li>
+        <li>Attr Name: <code>href</code></li>
+        <li>Output: <code>Array of values</code></li>
+    </ul>
+</script>
+
+<style>
+    #attributeNameRow {
+        display: none;
+    }
+</style>
+
+<script>
+    $('#node-input-attribute').on('change', function() {
+        if (this.value === 'attr') {
+            $('#attributeNameRow').show();
+        } else {
+            $('#attributeNameRow').hide();
+        }
+    });
+    
+    $(document).ready(function() {
+        if ($('#node-input-attribute').val() === 'attr') {
+            $('#attributeNameRow').show();
+        }
+    });
+</script>
