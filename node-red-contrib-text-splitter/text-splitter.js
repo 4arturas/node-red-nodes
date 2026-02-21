@@ -16,11 +16,22 @@ module.exports = function (RED) {
 
                 if (!text) {
                     node.warn("Empty payload received, nothing to split.");
+                    node.status({ fill: "yellow", shape: "ring", text: "empty payload" });
                     if (done) done();
                     return;
                 }
 
-                const separators = node.separator ? node.separator.split('|') : ['\n\n', '\n', ' ', ''];
+                // Parse separators: convert escape sequences like \n to actual newlines
+                let separators = ['\n\n', '\n', ' ', ''];
+                if (node.separator) {
+                    separators = node.separator
+                        .split('|')
+                        .map(s => s
+                            .replace(/\\n/g, '\n')
+                            .replace(/\\r/g, '\r')
+                            .replace(/\\t/g, '\t')
+                        );
+                }
 
                 const splitter = new RecursiveCharacterTextSplitter({
                     chunkSize: node.chunkSize,

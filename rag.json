@@ -1,0 +1,118 @@
+[
+  {
+    "id": "inject-url",
+    "type": "inject",
+    "z": "rag-index-flow",
+    "g": "3bf89348858e50de",
+    "name": "URL to Index",
+    "props": [
+      {
+        "p": "url",
+        "v": "https://www.imsdb.com/scripts/Star-Wars-A-New-Hope.html",
+        "vt": "str"
+      },
+      {
+        "p": "metadata.title",
+        "v": "Star Wars: A New Hope",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "x": 160,
+    "y": 260,
+    "wires": [
+      [
+        "5cdb57fc5cd920d2"
+      ]
+    ]
+  },
+  {
+    "id": "5cdb57fc5cd920d2",
+    "type": "file in",
+    "z": "rag-index-flow",
+    "g": "3bf89348858e50de",
+    "name": "star-wars.html",
+    "filename": "C:\\Users\\4artu\\IdeaProjects\\node-red-nodes\\star-wars.html",
+    "filenameType": "str",
+    "format": "utf8",
+    "chunk": false,
+    "sendError": false,
+    "encoding": "none",
+    "allProps": false,
+    "x": 360,
+    "y": 260,
+    "wires": [
+      [
+        "cheerio-parse"
+      ]
+    ]
+  },
+  {
+    "id": "cheerio-parse",
+    "type": "cheerio",
+    "z": "rag-index-flow",
+    "g": "3bf89348858e50de",
+    "name": "Extract Script Text",
+    "selector": "pre",
+    "attribute": "text",
+    "attributeName": "",
+    "outputFormat": "string",
+    "x": 570,
+    "y": 260,
+    "wires": [
+      [
+        "text-splitter"
+      ]
+    ]
+  },
+  {
+    "id": "text-splitter",
+    "type": "text-splitter",
+    "z": "rag-index-flow",
+    "g": "3bf89348858e50de",
+    "name": "Split into Chunks",
+    "chunkSize": 1000,
+    "chunkOverlap": 100,
+    "separator": "\\n\\n|\\n| |",
+    "outputFormat": "array",
+    "x": 840,
+    "y": 260,
+    "wires": [
+      [
+        "split-chunks",
+        "b671ce32bf03343a"
+      ]
+    ]
+  },
+  {
+    "id": "b671ce32bf03343a",
+    "type": "file",
+    "z": "rag-index-flow",
+    "g": "3bf89348858e50de",
+    "name": "debug.md",
+    "filename": "C:\\Users\\4artu\\IdeaProjects\\node-red-nodes\\debug.md",
+    "filenameType": "str",
+    "appendNewline": true,
+    "createDir": false,
+    "overwriteFile": "true",
+    "encoding": "none",
+    "x": 930,
+    "y": 120,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "dc4a605883d4020b",
+    "type": "global-config",
+    "env": [],
+    "modules": {
+      "node-red-contrib-cheerio": "1.0.0",
+      "node-red-contrib-text-splitter": "1.0.0"
+    }
+  }
+]
