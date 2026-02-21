@@ -33,5 +33,5 @@ module.exports = function(RED) {
             }
         });
     }
-    RED.nodes.registerType("chat-ollama", ChatOllamaNode);
+    RED.nodes.registerType("ollama-chat", ChatOllamaNode);
 };

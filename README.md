@@ -10,7 +10,7 @@ A collection of custom Node-RED nodes for building **Retrieval-Augmented Generat
 
 | Node | Package | Description | Status |
 |------|---------|-------------|--------|
-| **ChatOllama** | `node-red-contrib-chat-ollama` | Chat with Ollama models (qwen2.5, llama3, etc.) | ✅ Ready |
+| **ChatOllama** | `node-red-contrib-ollama-chat` | Chat with Ollama models (qwen2.5, llama3, etc.) | ✅ Ready |
 | **Cheerio** | `node-red-contrib-cheerio` | Parse HTML and extract data using CSS selectors | ✅ Ready |
 | **Text Splitter** | `node-red-contrib-text-splitter` | Split text into chunks for RAG indexing | ✅ Ready |
 | **Ollama Embeddings** | `node-red-contrib-ollama-embeddings` | Generate embeddings using Ollama | ✅ Ready |
@@ -101,7 +101,7 @@ These scripts will:
 
 ```cmd
 cd C:\Users\4artu\.node-red
-npm install C:\Users\4artu\IdeaProjects\node-red-nodes\node-red-contrib-chat-ollama
+npm install C:\Users\4artu\IdeaProjects\node-red-nodes\node-red-contrib-ollama-chat
 npm install C:\Users\4artu\IdeaProjects\node-red-nodes\node-red-contrib-cheerio
 npm install C:\Users\4artu\IdeaProjects\node-red-nodes\node-red-contrib-text-splitter
 npm install C:\Users\4artu\IdeaProjects\node-red-nodes\node-red-contrib-ollama-embeddings
@@ -115,7 +115,7 @@ npm install C:\Users\4artu\IdeaProjects\node-red-nodes\node-red-contrib-turndown
 ```bash
 cd ~/.node-red
 
-npm install /path/to/node-red-contrib-chat-ollama
+npm install /path/to/node-red-contrib-ollama-chat
 npm install /path/to/node-red-contrib-cheerio
 npm install /path/to/node-red-contrib-mcp
 npm install /path/to/node-red-contrib-turndown
@@ -227,14 +227,14 @@ The example includes 3 tabs:
 
 ## 🗂️ Node Catalog
 
-### node-red-contrib-chat-ollama
+### node-red-contrib-ollama-chat
 
 Chat with Ollama models. Supports streaming and tool calling.
 
-**Input:** `msg.payload` - String or message array  
+**Input:** `msg.payload` - String or message array
 **Output:** `msg.payload` - AI response content
 
-[View Documentation →](./node-red-contrib-chat-ollama/README.md)
+[View Documentation →](./node-red-contrib-ollama-chat/README.md)
 
 ---
 

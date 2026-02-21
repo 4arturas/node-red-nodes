@@ -44,5 +44,5 @@ module.exports = function (RED) {
         });
     }
 
-    RED.nodes.registerType("ollama-embeddings", OllamaEmbeddingsNode);
+    RED.nodes.registerType("ollama-emb", OllamaEmbeddingsNode);
 };

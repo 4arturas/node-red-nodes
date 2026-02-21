@@ -1,11 +1,11 @@
 {
-  "name": "node-red-contrib-chat-ollama",
+  "name": "node-red-contrib-ollama-chat",
   "version": "1.0.0",
   "description": "LangChain ChatOllama node for Node-RED",
   "main": "chat-ollama.js",
   "node-red": {
     "nodes": {
-      "chat-ollama": "chat-ollama.js"
+      "ollama-chat": "chat-ollama.js"
     }
   },
   "dependencies": {

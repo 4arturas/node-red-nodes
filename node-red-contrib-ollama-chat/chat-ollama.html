@@ -1,7 +1,7 @@
 <script type="text/javascript">
-    RED.nodes.registerType('chat-ollama', {
+    RED.nodes.registerType('ollama-chat', {
         category: 'rag',
-        color: '#f3a011',
+        color: '#5DADE2',
         defaults: {
             name: { value: "" },
             baseUrl: { value: "http://localhost:11434" },
@@ -12,12 +12,12 @@
         outputs: 1,
         icon: "font-awesome/fa-commenting-o",
         label: function() {
-            return this.name || this.modelName || "ChatOllama";
+            return this.name || this.modelName || "Ollama Chat";
         }
     });
 </script>
 
-<script type="text/html" data-template-name="chat-ollama">
+<script type="text/html" data-template-name="ollama-chat">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
