@@ -1,0 +1,20 @@
+{
+  "name": "mlflow-langchain-ollama",
+  "version": "1.0.0",
+  "description": "Simple MLflow example with LangChain and Ollama using functional API",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "tracing": "node tracing-example.js",
+    "tracing-rest": "node tracing-rest-api.js"
+  },
+  "dependencies": {
+    "@langchain/core": "^1.1.27",
+    "@langchain/langgraph": "^1.1.5",
+    "@langchain/ollama": "^1.2.4",
+    "dayjs": "^1.11.19",
+    "mlflow-tracing": "^0.1.3",
+    "protobufjs": "^8.0.0"
+  }
+}

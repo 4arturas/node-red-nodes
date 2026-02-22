@@ -1,0 +1,66 @@
+<script type="text/javascript">
+    RED.nodes.registerType('mlflow-log-param', {
+        category: 'mlflow',
+        color: '#a4b0ff',
+        defaults: {
+            name: { value: "" },
+            trackingUri: { value: "http://localhost:5000", required: true },
+            runId: { value: "" },
+            paramName: { value: "", required: true },
+            paramValue: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-pencil",
+        label: function() {
+            return this.name || this.paramName || "Log Param";
+        },
+        labelStyle: function() {
+            return this.name ? "node_label_italic" : "";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="mlflow-log-param">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-trackingUri"><i class="fa fa-globe"></i> Tracking URI</label>
+        <input type="text" id="node-input-trackingUri" placeholder="http://localhost:5000">
+    </div>
+    <div class="form-row">
+        <label for="node-input-runId"><i class="fa fa-play-circle"></i> Run ID</label>
+        <input type="text" id="node-input-runId" placeholder="Use msg.runId">
+    </div>
+    <div class="form-row">
+        <label for="node-input-paramName"><i class="fa fa-tag"></i> Param Name</label>
+        <input type="text" id="node-input-paramName" placeholder="e.g., model">
+    </div>
+    <div class="form-row">
+        <label for="node-input-paramValue"><i class="fa fa-value"></i> Param Value</label>
+        <input type="text" id="node-input-paramValue" placeholder="Use msg.paramValue">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="mlflow-log-param">
+    <p>Log parameters to MLflow runs via REST API.</p>
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>runId <span class="property-type">string</span></dt>
+        <dd>Required: The run ID to log to</dd>
+        <dt>paramName <span class="property-type">string</span></dt>
+        <dd>Optional: Parameter name (overrides node config)</dd>
+        <dt>paramValue <span class="property-type">any</span></dt>
+        <dd>Optional: Parameter value (overrides node config)</dd>
+    </dl>
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>paramLogged <span class="property-type">boolean</span></dt>
+        <dd>True if parameter was logged successfully</dd>
+    </dl>
+    <h3>Details</h3>
+    <p>Logs a single parameter to the specified MLflow run.</p>
+    <p>Parameter values are converted to strings.</p>
+</script>

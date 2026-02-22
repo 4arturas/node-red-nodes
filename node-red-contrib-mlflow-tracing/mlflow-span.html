@@ -1,0 +1,85 @@
+<script type="text/javascript">
+    RED.nodes.registerType('mlflow-span', {
+        category: 'mlflow',
+        color: '#a4b0ff',
+        defaults: {
+            name: { value: "" },
+            trackingUri: { value: "http://localhost:5000", required: true },
+            runId: { value: "" },
+            spanName: { value: "", required: true },
+            spanType: { value: "CHAIN" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-hourglass",
+        label: function() {
+            return this.name || this.spanName || "MLflow Span";
+        },
+        labelStyle: function() {
+            return this.name ? "node_label_italic" : "";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="mlflow-span">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-trackingUri"><i class="fa fa-globe"></i> Tracking URI</label>
+        <input type="text" id="node-input-trackingUri" placeholder="http://localhost:5000">
+    </div>
+    <div class="form-row">
+        <label for="node-input-runId"><i class="fa fa-play-circle"></i> Run ID</label>
+        <input type="text" id="node-input-runId" placeholder="Use msg.runId">
+    </div>
+    <div class="form-row">
+        <label for="node-input-spanName"><i class="fa fa-tag"></i> Span Name</label>
+        <input type="text" id="node-input-spanName" placeholder="e.g., generate-outline">
+    </div>
+    <div class="form-row">
+        <label for="node-input-spanType"><i class="fa fa-cubes"></i> Span Type</label>
+        <select id="node-input-spanType">
+            <option value="CHAIN">CHAIN</option>
+            <option value="LLM">LLM</option>
+            <option value="RETRIEVER">RETRIEVER</option>
+            <option value="EMBEDDING">EMBEDDING</option>
+            <option value="TOOL">TOOL</option>
+            <option value="PARSER">PARSER</option>
+        </select>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="mlflow-span">
+    <p>Create traced spans for LLM operations in MLflow.</p>
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>runId <span class="property-type">string</span></dt>
+        <dd>Required: The run ID for the span</dd>
+        <dt>spanName <span class="property-type">string</span></dt>
+        <dd>Optional: Span name (overrides node config)</dd>
+        <dt>spanType <span class="property-type">string</span></dt>
+        <dd>Optional: Span type (overrides node config)</dd>
+        <dt>payload <span class="property-type">any</span></dt>
+        <dd>The content/data to process in this span</dd>
+    </dl>
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>spanId <span class="property-type">string</span></dt>
+        <dd>The generated span ID</dd>
+        <dt>spanStartTime <span class="property-type">number</span></dt>
+        <dd>Span start timestamp in microseconds</dd>
+    </dl>
+    <h3>Details</h3>
+    <p>Creates a traced span for tracking LLM operations.</p>
+    <p>Span types:</p>
+    <ul>
+        <li><b>CHAIN</b> - General chain/sequence of operations</li>
+        <li><b>LLM</b> - Large language model calls</li>
+        <li><b>RETRIEVER</b> - Document retrieval operations</li>
+        <li><b>EMBEDDING</b> - Embedding generation</li>
+        <li><b>TOOL</b> - External tool calls</li>
+        <li><b>PARSER</b> - Text parsing operations</li>
+    </ul>
+</script>

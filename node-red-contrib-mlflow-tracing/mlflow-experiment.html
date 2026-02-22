@@ -1,0 +1,69 @@
+<script type="text/javascript">
+    RED.nodes.registerType('mlflow-experiment', {
+        category: 'mlflow',
+        color: '#a4b0ff',
+        defaults: {
+            name: { value: "" },
+            trackingUri: { value: "http://localhost:5000", required: true },
+            experimentName: { value: "", required: true },
+            operation: { value: "get-or-create", required: true }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-database",
+        label: function() {
+            return this.name || this.experimentName || "MLflow Experiment";
+        },
+        labelStyle: function() {
+            return this.name ? "node_label_italic" : "";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="mlflow-experiment">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-trackingUri"><i class="fa fa-globe"></i> Tracking URI</label>
+        <input type="text" id="node-input-trackingUri" placeholder="http://localhost:5000">
+    </div>
+    <div class="form-row">
+        <label for="node-input-experimentName"><i class="fa fa-flask"></i> Experiment Name</label>
+        <input type="text" id="node-input-experimentName" placeholder="my-experiment">
+    </div>
+    <div class="form-row">
+        <label for="node-input-operation"><i class="fa fa-cogs"></i> Operation</label>
+        <select id="node-input-operation">
+            <option value="get-or-create">Get or Create</option>
+            <option value="get-by-name">Get By Name</option>
+            <option value="create">Create</option>
+        </select>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="mlflow-experiment">
+    <p>Get or create MLflow experiments via REST API.</p>
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>experimentName <span class="property-type">string</span></dt>
+        <dd>Optional: Name of the experiment (overrides node config)</dd>
+    </dl>
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>experimentId <span class="property-type">string</span></dt>
+        <dd>The experiment ID</dd>
+        <dt>experiment <span class="property-type">object</span></dt>
+        <dd>Full experiment object</dd>
+        <dt>existing <span class="property-type">boolean</span></dt>
+        <dd>True if experiment already existed</dd>
+    </dl>
+    <h3>Details</h3>
+    <p>Operations:</p>
+    <ul>
+        <li><b>Get or Create</b> - Gets existing experiment or creates new one</li>
+        <li><b>Get By Name</b> - Only gets existing experiment</li>
+        <li><b>Create</b> - Always creates a new experiment</li>
+    </ul>
+</script>

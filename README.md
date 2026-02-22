@@ -31,6 +31,16 @@ A collection of custom Node-RED nodes for building **Retrieval-Augmented Generat
 |------|---------|-------------|--------|
 | **Turndown** | `node-red-contrib-turndown` | Convert HTML to Markdown | ✅ Ready |
 
+### MLflow Tracing Nodes
+
+| Node | Package | Description | Status |
+|------|---------|-------------|--------|
+| **MLflow Experiment** | `node-red-contrib-mlflow-tracing` | Get or create MLflow experiments | ✅ Ready |
+| **MLflow Run** | `node-red-contrib-mlflow-tracing` | Create and manage MLflow runs | ✅ Ready |
+| **MLflow Log Param** | `node-red-contrib-mlflow-tracing` | Log parameters to MLflow runs | ✅ Ready |
+| **MLflow Log Metric** | `node-red-contrib-mlflow-tracing` | Log metrics to MLflow runs | ✅ Ready |
+| **MLflow Span** | `node-red-contrib-mlflow-tracing` | Create traced spans for LLM operations | ✅ Ready |
+
 ---
 
 ## 🚀 RAG Architecture Overview

@@ -1,0 +1,66 @@
+<script type="text/javascript">
+    RED.nodes.registerType('mlflow-log-metric', {
+        category: 'mlflow',
+        color: '#a4b0ff',
+        defaults: {
+            name: { value: "" },
+            trackingUri: { value: "http://localhost:5000", required: true },
+            runId: { value: "" },
+            metricName: { value: "", required: true },
+            metricValue: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-line-chart",
+        label: function() {
+            return this.name || this.metricName || "Log Metric";
+        },
+        labelStyle: function() {
+            return this.name ? "node_label_italic" : "";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="mlflow-log-metric">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-trackingUri"><i class="fa fa-globe"></i> Tracking URI</label>
+        <input type="text" id="node-input-trackingUri" placeholder="http://localhost:5000">
+    </div>
+    <div class="form-row">
+        <label for="node-input-runId"><i class="fa fa-play-circle"></i> Run ID</label>
+        <input type="text" id="node-input-runId" placeholder="Use msg.runId">
+    </div>
+    <div class="form-row">
+        <label for="node-input-metricName"><i class="fa fa-tag"></i> Metric Name</label>
+        <input type="text" id="node-input-metricName" placeholder="e.g., accuracy">
+    </div>
+    <div class="form-row">
+        <label for="node-input-metricValue"><i class="fa fa-value"></i> Metric Value</label>
+        <input type="text" id="node-input-metricValue" placeholder="Use msg.metricValue">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="mlflow-log-metric">
+    <p>Log metrics to MLflow runs via REST API.</p>
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>runId <span class="property-type">string</span></dt>
+        <dd>Required: The run ID to log to</dd>
+        <dt>metricName <span class="property-type">string</span></dt>
+        <dd>Optional: Metric name (overrides node config)</dd>
+        <dt>metricValue <span class="property-type">number</span></dt>
+        <dd>Optional: Metric value (overrides node config)</dd>
+    </dl>
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>metricLogged <span class="property-type">boolean</span></dt>
+        <dd>True if metric was logged successfully</dd>
+    </dl>
+    <h3>Details</h3>
+    <p>Logs a single metric to the specified MLflow run.</p>
+    <p>The metric value must be a number. Timestamp is automatically set to current time.</p>
+</script>

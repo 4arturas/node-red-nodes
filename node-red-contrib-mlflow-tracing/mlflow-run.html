@@ -1,0 +1,87 @@
+<script type="text/javascript">
+    RED.nodes.registerType('mlflow-run', {
+        category: 'mlflow',
+        color: '#a4b0ff',
+        defaults: {
+            name: { value: "" },
+            trackingUri: { value: "http://localhost:5000", required: true },
+            experimentId: { value: "" },
+            runName: { value: "" },
+            operation: { value: "create", required: true },
+            runId: { value: "" },
+            status: { value: "FINISHED" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-play-circle",
+        label: function() {
+            return this.name || this.runName || "MLflow Run";
+        },
+        labelStyle: function() {
+            return this.name ? "node_label_italic" : "";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="mlflow-run">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-trackingUri"><i class="fa fa-globe"></i> Tracking URI</label>
+        <input type="text" id="node-input-trackingUri" placeholder="http://localhost:5000">
+    </div>
+    <div class="form-row">
+        <label for="node-input-operation"><i class="fa fa-cogs"></i> Operation</label>
+        <select id="node-input-operation">
+            <option value="create">Create</option>
+            <option value="update-status">Update Status</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-experimentId"><i class="fa fa-flask"></i> Experiment ID</label>
+        <input type="text" id="node-input-experimentId" placeholder="Use msg.experimentId">
+    </div>
+    <div class="form-row">
+        <label for="node-input-runName"><i class="fa fa-tag"></i> Run Name</label>
+        <input type="text" id="node-input-runName" placeholder="Use msg.runName">
+    </div>
+    <div class="form-row" id="run-status-row">
+        <label for="node-input-status"><i class="fa fa-info-circle"></i> Status</label>
+        <select id="node-input-status">
+            <option value="FINISHED">FINISHED</option>
+            <option value="FAILED">FAILED</option>
+            <option value="RUNNING">RUNNING</option>
+            <option value="SCHEDULED">SCHEDULED</option>
+        </select>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="mlflow-run">
+    <p>Create and manage MLflow runs via REST API.</p>
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>experimentId <span class="property-type">string</span></dt>
+        <dd>Parent experiment ID (required for create)</dd>
+        <dt>runName <span class="property-type">string</span></dt>
+        <dd>Optional: Name for the run</dd>
+        <dt>runId <span class="property-type">string</span></dt>
+        <dd>Required for update-status operation</dd>
+        <dt>status <span class="property-type">string</span></dt>
+        <dd>Required for update-status: FINISHED, FAILED, RUNNING, SCHEDULED</dd>
+    </dl>
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>runId <span class="property-type">string</span></dt>
+        <dd>The created run ID</dd>
+        <dt>run <span class="property-type">object</span></dt>
+        <dd>Full run object with info</dd>
+    </dl>
+    <h3>Details</h3>
+    <p>Operations:</p>
+    <ul>
+        <li><b>Create</b> - Creates a new run in the specified experiment</li>
+        <li><b>Update Status</b> - Updates an existing run's status</li>
+    </ul>
+</script>
