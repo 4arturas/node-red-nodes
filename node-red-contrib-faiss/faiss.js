@@ -1,4 +1,5 @@
 const { FaissStore } = require('@langchain/community/vectorstores/faiss');
+const { Document } = require('@langchain/core/documents');
 
 module.exports = function (RED) {
     function FaissStoreNode(config) {
@@ -10,22 +11,6 @@ module.exports = function (RED) {
         node.k = parseInt(config.k) || 5;
 
         let vectorStore = null;
-
-        async function getVectorStore(embeddings) {
-            if (vectorStore) {
-                return vectorStore;
-            }
-
-            try {
-                vectorStore = await FaissStore.load(node.persistPath, embeddings);
-                node.log('Loaded existing FAISS index');
-            } catch {
-                vectorStore = new FaissStore(embeddings, {});
-                node.log('Created new FAISS index');
-            }
-
-            return vectorStore;
-        }
 
         node.on('input', async function (msg, send, done) {
             node.status({ fill: "blue", shape: "dot", text: "processing..." });
@@ -41,7 +26,37 @@ module.exports = function (RED) {
                 }
 
                 if (node.operation === 'add') {
-                    const docs = msg.documents || [{ pageContent: msg.payload, metadata: msg.metadata || {} }];
+                    let docs;
+
+                    // Handle documents with embeddings from ollama-emb node
+                    if (msg.documents && Array.isArray(msg.documents)) {
+                        docs = msg.documents.map(d => new Document({
+                            pageContent: d.pageContent,
+                            metadata: d.metadata || {}
+                        }));
+                    } else if (Array.isArray(msg.payload)) {
+                        // Handle array of documents (from text-splitter output)
+                        docs = msg.payload.map(item => {
+                            if (typeof item === 'object' && item.pageContent !== undefined) {
+                                return new Document({
+                                    pageContent: item.pageContent,
+                                    metadata: item.metadata || {}
+                                });
+                            } else {
+                                return new Document({
+                                    pageContent: String(item),
+                                    metadata: {}
+                                });
+                            }
+                        });
+                    } else if (msg.documents) {
+                        docs = msg.documents;
+                    } else {
+                        docs = [new Document({
+                            pageContent: msg.payload,
+                            metadata: msg.metadata || {}
+                        })];
+                    }
 
                     if (!vectorStore) {
                         vectorStore = await FaissStore.fromDocuments(docs, embeddings);
@@ -52,6 +67,7 @@ module.exports = function (RED) {
                     await vectorStore.save(node.persistPath);
 
                     msg.payload = `Added ${docs.length} document(s) to FAISS index`;
+                    msg.documentCount = docs.length;
                     node.status({ fill: "green", shape: "dot", text: `added ${docs.length} docs` });
 
                 } else if (node.operation === 'search') {

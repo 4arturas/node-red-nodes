@@ -1,20 +1,63 @@
 [
   {
-    "id": "inject-url",
+    "id": "rag-index-tab",
+    "type": "tab",
+    "label": "RAG - Index Documents"
+  },
+  {
+    "id": "rag-query-tab",
+    "type": "tab",
+    "label": "RAG - Query & Answer"
+  },
+  {
+    "id": "62d868f57bc511c7",
+    "type": "group",
+    "z": "rag-index-tab",
+    "style": {
+      "stroke": "#999999",
+      "stroke-opacity": "1",
+      "fill": "none",
+      "fill-opacity": "1",
+      "label": true,
+      "label-position": "nw",
+      "color": "#a4a4a4"
+    },
+    "nodes": [
+      "46b2639cccac54de",
+      "29601029757e0d91",
+      "d0745308be753df7",
+      "65857e6e39d6c2cd",
+      "aaecb81139e51e39",
+      "c057a054dcedf7b1",
+      "81ffab5bce2c25f1",
+      "e7563170c04fc112",
+      "901788adef43c4b8",
+      "85a31818b5360b99"
+    ],
+    "x": 174,
+    "y": 1299,
+    "w": 1292,
+    "h": 142
+  },
+  {
+    "id": "46b2639cccac54de",
     "type": "inject",
     "z": "rag-index-flow",
-    "g": "3bf89348858e50de",
+    "g": "62d868f57bc511c7",
     "name": "URL to Index",
     "props": [
       {
-        "p": "url",
-        "v": "https://www.imsdb.com/scripts/Star-Wars-A-New-Hope.html",
-        "vt": "str"
+        "p": "payload"
       },
       {
         "p": "metadata.title",
         "v": "Star Wars: A New Hope",
         "vt": "str"
+      },
+      {
+        "p": "toolResults",
+        "v": "[]",
+        "vt": "json"
       }
     ],
     "repeat": "",
@@ -22,97 +65,368 @@
     "once": false,
     "onceDelay": 0.1,
     "topic": "",
-    "x": 160,
-    "y": 260,
+    "payload": "[   {     \"title\": \"Star Wars: A New Hope\",     \"url\": \"https://www.imsdb.com/scripts/Star-Wars-A-New-Hope.html\"   },   {     \"title\": \"Star Wars: The Empire Strikes Back\",     \"url\": \"https://www.imsdb.com/scripts/Star-Wars-The-Empire-Strikes-Back.html\"   },   {     \"title\": \"Star Wars: Return of the Jedi\",     \"url\": \"https://www.imsdb.com/scripts/Star-Wars-Return-of-the-Jedi.html\"   } ]",
+    "payloadType": "json",
+    "x": 290,
+    "y": 1340,
     "wires": [
       [
-        "5cdb57fc5cd920d2"
+        "29601029757e0d91"
       ]
     ]
   },
   {
-    "id": "5cdb57fc5cd920d2",
+    "id": "29601029757e0d91",
+    "type": "split",
+    "z": "rag-index-flow",
+    "g": "62d868f57bc511c7",
+    "name": "",
+    "splt": "\\n",
+    "spltType": "str",
+    "arraySplt": 1,
+    "arraySpltType": "len",
+    "stream": false,
+    "addname": "",
+    "property": "payload",
+    "x": 390,
+    "y": 1400,
+    "wires": [
+      [
+        "81ffab5bce2c25f1"
+      ]
+    ]
+  },
+  {
+    "id": "d0745308be753df7",
     "type": "file in",
     "z": "rag-index-flow",
-    "g": "3bf89348858e50de",
-    "name": "star-wars.html",
-    "filename": "C:\\Users\\4artu\\IdeaProjects\\node-red-nodes\\star-wars.html",
-    "filenameType": "str",
+    "g": "62d868f57bc511c7",
+    "name": "Read star wars file",
+    "filename": "fileName",
+    "filenameType": "msg",
     "format": "utf8",
     "chunk": false,
     "sendError": false,
     "encoding": "none",
     "allProps": false,
-    "x": 360,
-    "y": 260,
+    "x": 670,
+    "y": 1400,
     "wires": [
       [
-        "cheerio-parse"
+        "65857e6e39d6c2cd"
       ]
     ]
   },
   {
-    "id": "cheerio-parse",
+    "id": "65857e6e39d6c2cd",
     "type": "cheerio",
     "z": "rag-index-flow",
-    "g": "3bf89348858e50de",
-    "name": "Extract Script Text",
+    "g": "62d868f57bc511c7",
+    "name": "HTML To Text",
     "selector": "pre",
     "attribute": "text",
     "attributeName": "",
     "outputFormat": "string",
-    "x": 570,
-    "y": 260,
+    "x": 800,
+    "y": 1340,
     "wires": [
       [
-        "text-splitter"
+        "aaecb81139e51e39"
       ]
     ]
   },
   {
-    "id": "text-splitter",
+    "id": "aaecb81139e51e39",
+    "type": "change",
+    "z": "rag-index-flow",
+    "g": "62d868f57bc511c7",
+    "name": "Create JSON",
+    "rules": [
+      {
+        "t": "set",
+        "p": "payload",
+        "pt": "msg",
+        "to": "(\t    $newMessage := {\t        \"pageContent\":msg.payload, \t        \"metadata\": {\t            \"source\": msg.url,\t            \"title\": msg.title\t        }\t    };\t)",
+        "tot": "jsonata"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 910,
+    "y": 1400,
+    "wires": [
+      [
+        "c057a054dcedf7b1"
+      ]
+    ]
+  },
+  {
+    "id": "c057a054dcedf7b1",
     "type": "text-splitter",
     "z": "rag-index-flow",
-    "g": "3bf89348858e50de",
-    "name": "Split into Chunks",
+    "g": "62d868f57bc511c7",
+    "name": "",
     "chunkSize": 1000,
     "chunkOverlap": 100,
-    "separator": "\\n\\n|\\n| |",
+    "separator": "\n\n|\n| |",
     "outputFormat": "array",
-    "x": 840,
-    "y": 260,
+    "x": 1030,
+    "y": 1340,
     "wires": [
       [
-        "split-chunks",
-        "b671ce32bf03343a"
+        "e7563170c04fc112"
       ]
     ]
   },
   {
-    "id": "b671ce32bf03343a",
-    "type": "file",
+    "id": "81ffab5bce2c25f1",
+    "type": "change",
     "z": "rag-index-flow",
-    "g": "3bf89348858e50de",
-    "name": "debug.md",
-    "filename": "C:\\Users\\4artu\\IdeaProjects\\node-red-nodes\\debug.md",
-    "filenameType": "str",
-    "appendNewline": true,
-    "createDir": false,
-    "overwriteFile": "true",
-    "encoding": "none",
-    "x": 930,
-    "y": 120,
+    "g": "62d868f57bc511c7",
+    "name": "url & fileName & title",
+    "rules": [
+      {
+        "t": "set",
+        "p": "url",
+        "pt": "msg",
+        "to": "payload.url",
+        "tot": "msg"
+      },
+      {
+        "t": "set",
+        "p": "fileName",
+        "pt": "msg",
+        "to": "\"C:/Users/4artu/IdeaProjects/node-red-nodes/\" & \t$replace(\t    payload.title & \".html\",\t    /[ :]+/,\t    \"-\"\t)",
+        "tot": "jsonata"
+      },
+      {
+        "t": "set",
+        "p": "title",
+        "pt": "msg",
+        "to": "payload.title",
+        "tot": "msg"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 520,
+    "y": 1340,
     "wires": [
-      []
+      [
+        "d0745308be753df7"
+      ]
     ]
   },
   {
-    "id": "dc4a605883d4020b",
+    "id": "e7563170c04fc112",
+    "type": "ollama-emb",
+    "z": "rag-index-flow",
+    "g": "62d868f57bc511c7",
+    "name": "",
+    "baseUrl": "http://localhost:11434",
+    "model": "mxbai-embed-large",
+    "x": 1150,
+    "y": 1400,
+    "wires": [
+      [
+        "85a31818b5360b99"
+      ]
+    ]
+  },
+  {
+    "id": "901788adef43c4b8",
+    "type": "debug",
+    "z": "rag-index-flow",
+    "g": "62d868f57bc511c7",
+    "name": "debug 14",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 1360,
+    "y": 1400,
+    "wires": []
+  },
+  {
+    "id": "85a31818b5360b99",
+    "type": "faiss-store",
+    "z": "rag-index-flow",
+    "g": "62d868f57bc511c7",
+    "name": "",
+    "operation": "add",
+    "persistPath": "./faiss_index",
+    "x": 1250,
+    "y": 1340,
+    "wires": [
+      [
+        "901788adef43c4b8"
+      ]
+    ]
+  },
+  {
+    "id": "fca3edf06d1b8cb9",
     "type": "global-config",
     "env": [],
     "modules": {
       "node-red-contrib-cheerio": "1.0.0",
-      "node-red-contrib-text-splitter": "1.0.0"
+      "node-red-contrib-text-splitter": "1.0.0",
+      "node-red-contrib-ollama-embeddings": "1.0.0",
+      "node-red-contrib-faiss": "1.0.0"
     }
+  },
+  {
+    "id": "rag-query-tab",
+    "type": "tab",
+    "label": "RAG - Query & Answer"
+  },
+  {
+    "id": "query-flow-group",
+    "type": "group",
+    "z": "rag-query-tab",
+    "style": {
+      "stroke": "#999999",
+      "stroke-opacity": "1",
+      "fill": "none",
+      "fill-opacity": "1",
+      "label": true,
+      "label-position": "nw",
+      "color": "#a4a4a4"
+    },
+    "nodes": [
+      "query-inject",
+      "query-embed",
+      "query-search",
+      "query-build-context",
+      "query-chat",
+      "query-response"
+    ],
+    "x": 80,
+    "y": 50,
+    "w": 1100,
+    "h": 180
+  },
+  {
+    "id": "query-inject",
+    "type": "inject",
+    "z": "rag-query-tab",
+    "g": "query-flow-group",
+    "name": "Ask Question",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "Who says \"I am your father\"?",
+    "payloadType": "str",
+    "x": 200,
+    "y": 100,
+    "wires": [
+      [
+        "query-embed"
+      ]
+    ]
+  },
+  {
+    "id": "query-embed",
+    "type": "ollama-emb",
+    "z": "rag-query-tab",
+    "g": "query-flow-group",
+    "name": "Generate Embedding",
+    "baseUrl": "http://localhost:11434",
+    "model": "mxbai-embed-large",
+    "x": 380,
+    "y": 100,
+    "wires": [
+      [
+        "query-search"
+      ]
+    ]
+  },
+  {
+    "id": "query-search",
+    "type": "faiss-store",
+    "z": "rag-query-tab",
+    "g": "query-flow-group",
+    "name": "Search FAISS",
+    "operation": "search",
+    "persistPath": "./faiss_index",
+    "k": 5,
+    "x": 540,
+    "y": 100,
+    "wires": [
+      [
+        "query-build-context"
+      ]
+    ]
+  },
+  {
+    "id": "query-build-context",
+    "type": "function",
+    "z": "rag-query-tab",
+    "g": "query-flow-group",
+    "name": "Build Context",
+    "func": "// Extract search results and build context\nconst results = msg.payload || [];\n\n// Build context from search results\nconst context = results.map((r, i) => {\n    const source = r.metadata?.title || r.metadata?.source || 'Unknown';\n    return `[${i + 1}] ${source}:\\n${r.pageContent}`;\n}).join('\\n\\n---\\n\\n');\n\n// Create message for ChatOllama\nmsg.payload = [\n    {\n        role: 'system',\n        content: `You are a Star Wars Movie Script Expert. Use ONLY the following context to answer questions. If the answer isn't in the context, say \"There is no information about this in the original Star Wars scripts.\"\\n\\nContext:\\n${context}`\n    },\n    {\n        role: 'user',\n        content: msg.question || msg.payload\n    }\n];\n\n// Store search results for reference\nmsg.searchResults = results;\nmsg.context = context;\n\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 700,
+    "y": 100,
+    "wires": [
+      [
+        "query-chat"
+      ]
+    ]
+  },
+  {
+    "id": "query-chat",
+    "type": "ollama-chat",
+    "z": "rag-query-tab",
+    "g": "query-flow-group",
+    "name": "Chat Ollama",
+    "baseUrl": "http://localhost:11434",
+    "modelName": "qwen2.5:7b",
+    "temperature": 0,
+    "x": 860,
+    "y": 100,
+    "wires": [
+      [
+        "query-response"
+      ]
+    ]
+  },
+  {
+    "id": "query-response",
+    "type": "debug",
+    "z": "rag-query-tab",
+    "g": "query-flow-group",
+    "name": "Answer",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 1020,
+    "y": 100,
+    "wires": []
   }
 ]

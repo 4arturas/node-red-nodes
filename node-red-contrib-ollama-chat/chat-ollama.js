@@ -1,4 +1,5 @@
 const { ChatOllama } = require("@langchain/ollama");
+const { ChatPromptTemplate } = require("@langchain/core/prompts");
 
 module.exports = function(RED) {
     function ChatOllamaNode(config) {
@@ -15,12 +16,31 @@ module.exports = function(RED) {
             node.status({fill:"blue", shape:"dot", text:"thinking..."});
 
             try {
-                const input = Array.isArray(msg.payload) ? msg.payload : [["user", msg.payload]];
+                let response;
 
-                const response = await model.invoke(input);
+                // Check if msg has RAG template configuration
+                if (msg.template !== undefined && msg.context !== undefined && msg.question !== undefined) {
+                    // RAG mode: Use ChatPromptTemplate with provided template
+                    const prompt = ChatPromptTemplate.fromTemplate(msg.template);
+                    const ragChain = prompt.pipe(model);
 
-                // Set the output
-                msg.payload = response.content;
+                    response = await ragChain.invoke({
+                        context: msg.context,
+                        question: msg.question
+                    });
+                    msg.payload = response.content;
+                } else if (Array.isArray(msg.payload)) {
+                    // Message tuple mode
+                    const input = msg.payload;
+                    response = await model.invoke(input);
+                    msg.payload = response.content;
+                } else {
+                    // Simple text mode
+                    const input = [["user", msg.payload]];
+                    response = await model.invoke(input);
+                    msg.payload = response.content;
+                }
+
                 msg.rawResponse = response;
 
                 node.status({fill:"green", shape:"dot", text:"done"});

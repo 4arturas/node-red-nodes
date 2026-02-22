@@ -10,11 +10,11 @@ module.exports = function (RED) {
         node.separator = config.separator || '\n\n';
         node.outputFormat = config.outputFormat || 'array';
 
-        node.on('input', function (msg, send, done) {
+        node.on('input', async function (msg, send, done) {
             try {
-                const text = msg.payload;
+                const input = msg.payload;
 
-                if (!text) {
+                if (!input) {
                     node.warn("Empty payload received, nothing to split.");
                     node.status({ fill: "yellow", shape: "ring", text: "empty payload" });
                     if (done) done();
@@ -39,18 +39,43 @@ module.exports = function (RED) {
                     separators: separators
                 });
 
-                const chunks = splitter.splitText(text.toString());
+                let chunks;
+                let metadata = msg.metadata || {};
 
-                if (node.outputFormat === 'array') {
-                    msg.payload = chunks;
-                    msg.chunkCount = chunks.length;
+                // Check if input is a LangChain document object (has pageContent and metadata)
+                if (typeof input === 'object' && input.pageContent !== undefined) {
+                    metadata = input.metadata || {};
+                    const text = input.pageContent;
+                    chunks = await splitter.splitText(text);
+                } else if (typeof input === 'string') {
+                    chunks = await splitter.splitText(input);
                 } else {
-                    msg.payload = chunks[0] || '';
-                    msg.chunks = chunks;
-                    msg.chunkCount = chunks.length;
+                    chunks = await splitter.splitText(String(input));
                 }
 
-                node.status({ fill: "green", shape: "dot", text: `split into ${chunks.length} chunks` });
+                if (!Array.isArray(chunks)) {
+                    node.warn("Splitting did not return an array");
+                    node.status({ fill: "red", shape: "ring", text: "invalid result" });
+                    if (done) done();
+                    return;
+                }
+
+                // Convert chunks to document format with metadata
+                const docs = chunks.map(chunk => ({
+                    pageContent: chunk,
+                    metadata: { ...metadata }
+                }));
+
+                if (node.outputFormat === 'array') {
+                    msg.payload = docs;
+                    msg.chunkCount = docs.length;
+                } else {
+                    msg.payload = docs[0] || { pageContent: '', metadata: {} };
+                    msg.chunks = docs;
+                    msg.chunkCount = docs.length;
+                }
+
+                node.status({ fill: "green", shape: "dot", text: `split into ${docs.length} chunks` });
                 send(msg);
 
             } catch (error) {

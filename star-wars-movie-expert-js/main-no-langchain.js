@@ -1,27 +1,26 @@
-import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
-import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-import { FaissStore } from "@langchain/community/vectorstores/faiss";
-import { ChatPromptTemplate } from "@langchain/core/prompts";
-import { StringOutputParser } from "@langchain/core/output_parsers";
-import { OllamaEmbeddings, ChatOllama } from "@langchain/ollama";
+import { createOllamaEmbeddings } from './ollama-embeddings.js';
+import { createOllamaChat } from './ollama-chat.js';
+import { createFaissStore, loadFaissStore } from './faiss-store.js';
+import { createTextSplitter } from './text-splitter.js';
+import { createCheerioLoader } from './cheerio-loader.js';
 import { existsSync } from "fs";
 import readline from "readline";
 
 const PERSIST_PATH = "./faiss_index";
 
-// Global variable - scripts to index
+// Scripts to index
 const starWarsScripts = [
   {
-    "title": "Star Wars: A New Hope",
-    "url": "https://www.imsdb.com/scripts/Star-Wars-A-New-Hope.html"
+    title: "Star Wars: A New Hope",
+    url: "https://www.imsdb.com/scripts/Star-Wars-A-New-Hope.html"
   },
   {
-    "title": "Star Wars: The Empire Strikes Back",
-    "url": "https://www.imsdb.com/scripts/Star-Wars-The-Empire-Strikes-Back.html"
+    title: "Star Wars: The Empire Strikes Back",
+    url: "https://www.imsdb.com/scripts/Star-Wars-The-Empire-Strikes-Back.html"
   },
   {
-    "title": "Star Wars: Return of the Jedi",
-    "url": "https://www.imsdb.com/scripts/Star-Wars-Return-of-the-Jedi.html"
+    title: "Star Wars: Return of the Jedi",
+    url: "https://www.imsdb.com/scripts/Star-Wars-Return-of-the-Jedi.html"
   }
 ];
 
@@ -37,14 +36,19 @@ Question:
 
 Answer:`;
 
+const askQuestion = (rl) => {
+  return new Promise((resolve) => {
+    rl.question("You: ", resolve);
+  });
+};
 
 async function main() {
-  const embeddings = new OllamaEmbeddings({ model: "mxbai-embed-large" });
+  const embeddings = createOllamaEmbeddings({ model: "mxbai-embed-large" });
 
   let vectorstore;
 
   if (existsSync(PERSIST_PATH)) {
-    vectorstore = await FaissStore.load(PERSIST_PATH, embeddings);
+    vectorstore = await loadFaissStore(PERSIST_PATH, embeddings);
     console.log("Loaded existing FAISS index");
   } else {
     console.log("Existing index not found, will create new one...");
@@ -54,7 +58,7 @@ async function main() {
 
     for (const script of starWarsScripts) {
       console.log(`Loading: ${script.title}...`);
-      const loader = new CheerioWebBaseLoader(script.url);
+      const loader = createCheerioLoader(script.url);
       const docs = await loader.load();
 
       if (docs.length > 0) {
@@ -68,7 +72,7 @@ async function main() {
     console.log("Splitting documents into chunks...");
     const allChunks = [];
 
-    const textSplitter = new RecursiveCharacterTextSplitter({
+    const textSplitter = createTextSplitter({
       chunkSize: 1000,
       chunkOverlap: 100,
       addStartIndex: true,
@@ -84,34 +88,27 @@ async function main() {
     console.log(`Total: ${allChunks.length} chunks.`);
 
     console.log("Creating vector store from all chunks...");
-    vectorstore = await FaissStore.fromDocuments(allChunks, embeddings);
+    vectorstore = await createFaissStore(allChunks, embeddings);
     await vectorstore.save(PERSIST_PATH);
     console.log("Vector store created and saved successfully!");
   }
 
   const retriever = vectorstore.asRetriever({ k: 5 });
 
-    // Interactive loop
+  // Interactive loop
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
   });
 
+  const llm = createOllamaChat({ model: "qwen2.5:7b", temperature: 0 });
+
   console.log("\n--- The Star Wars Movie Expert is ready to answer your questions ---");
   console.log("Type 'exit' or 'quit' to stop.\n");
 
-  const askQuestion = () => {
-    return new Promise((resolve) => {
-      rl.question("You: ", resolve);
-    });
-  };
-
-  const prompt = ChatPromptTemplate.fromTemplate(template);
-  const llm = new ChatOllama({ model: "qwen2.5:7b", temperature: 0 });
-  const ragChain = prompt.pipe(llm).pipe(new StringOutputParser());
   try {
     while (true) {
-      const query = await askQuestion();
+      const query = await askQuestion(rl);
 
       if (["exit", "quit"].includes(query.toLowerCase())) {
         console.log("May the Force be with you! Goodbye.");
@@ -120,10 +117,13 @@ async function main() {
       }
 
       const context = await retriever.invoke(query);
-      const response = await ragChain.invoke({
-        context: context.map(doc => doc.pageContent).join("\n\n"),
-        question: query
-      });
+      
+      // Build prompt from template
+      const prompt = template
+        .replace('{context}', context.map(doc => doc.pageContent).join("\n\n"))
+        .replace('{question}', query);
+
+      const response = await llm.invoke(prompt);
       console.log(`\nStar Wars Movie Expert: ${response}\n`);
     }
   } catch (error) {

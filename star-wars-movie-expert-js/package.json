@@ -1,0 +1,30 @@
+{
+  "name": "star-wars-movie-expert-js",
+  "version": "1.0.0",
+  "description": "Star Wars Movie Script Expert - JavaScript RAG version using Functional API",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "start": "node main.js",
+    "start:no-langchain": "node main-no-langchain.js"
+  },
+  "keywords": [
+    "star-wars",
+    "rag",
+    "langchain",
+    "qdrant",
+    "ollama",
+    "llm"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@langchain/community": "^0.3.0",
+    "@langchain/core": "^0.3.0",
+    "@langchain/ollama": "^0.2.0",
+    "@langchain/textsplitters": "^0.1.0",
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^16.4.5",
+    "faiss-node": "^0.5.1"
+  }
+}
