@@ -1,0 +1,187 @@
+[
+  {
+    "id": "79059eb6ac8ef628",
+    "type": "group",
+    "z": "rag-index-flow",
+    "name": "Fetch & Save HTML",
+    "style": {
+      "label": true
+    },
+    "nodes": [
+      "2fd69115ae5a0149",
+      "484eb220f3f11b1b",
+      "33a47f98a226445b",
+      "16be14632c4910bd",
+      "b7c4d71137d948c5",
+      "2b55afcd6ea37063"
+    ],
+    "x": 54,
+    "y": 479,
+    "w": 592,
+    "h": 242
+  },
+  {
+    "id": "2fd69115ae5a0149",
+    "type": "inject",
+    "z": "rag-index-flow",
+    "g": "79059eb6ac8ef628",
+    "name": "URL to Index",
+    "props": [
+      {
+        "p": "toolArray",
+        "v": "[   {     \"title\": \"Star Wars: A New Hope\",     \"url\": \"https://www.imsdb.com/scripts/Star-Wars-A-New-Hope.html\"   },   {     \"title\": \"Star Wars: The Empire Strikes Back\",     \"url\": \"https://www.imsdb.com/scripts/Star-Wars-The-Empire-Strikes-Back.html\"   },   {     \"title\": \"Star Wars: Return of the Jedi\",     \"url\": \"https://www.imsdb.com/scripts/Star-Wars-Return-of-the-Jedi.html\"   } ]",
+        "vt": "json"
+      },
+      {
+        "p": "metadata.title",
+        "v": "Star Wars: A New Hope",
+        "vt": "str"
+      },
+      {
+        "p": "toolResults",
+        "v": "[]",
+        "vt": "json"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "x": 170,
+    "y": 520,
+    "wires": [
+      [
+        "484eb220f3f11b1b"
+      ]
+    ]
+  },
+  {
+    "id": "484eb220f3f11b1b",
+    "type": "array-loop",
+    "z": "rag-index-flow",
+    "g": "79059eb6ac8ef628",
+    "name": "Loop",
+    "key": "toolIndex",
+    "keyType": "msg",
+    "reset": false,
+    "resetValue": "value-null",
+    "array": "toolArray",
+    "arrayType": "msg",
+    "x": 350,
+    "y": 540,
+    "wires": [
+      [
+        "33a47f98a226445b"
+      ],
+      [
+        "16be14632c4910bd"
+      ]
+    ]
+  },
+  {
+    "id": "33a47f98a226445b",
+    "type": "debug",
+    "z": "rag-index-flow",
+    "g": "79059eb6ac8ef628",
+    "name": "debug 12",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 540,
+    "y": 520,
+    "wires": []
+  },
+  {
+    "id": "16be14632c4910bd",
+    "type": "change",
+    "z": "rag-index-flow",
+    "g": "79059eb6ac8ef628",
+    "name": "url & fileName",
+    "rules": [
+      {
+        "t": "set",
+        "p": "url",
+        "pt": "msg",
+        "to": "payload.url",
+        "tot": "msg"
+      },
+      {
+        "t": "set",
+        "p": "fileName",
+        "pt": "msg",
+        "to": "\"C:/Users/4artu/IdeaProjects/node-red-nodes/\" & \t$replace(\t    payload.title & \".html\",\t    /[ :]+/,\t    \"-\"\t)",
+        "tot": "jsonata"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 200,
+    "y": 680,
+    "wires": [
+      [
+        "b7c4d71137d948c5"
+      ]
+    ]
+  },
+  {
+    "id": "b7c4d71137d948c5",
+    "type": "http request",
+    "z": "rag-index-flow",
+    "g": "79059eb6ac8ef628",
+    "name": "Fetch Webpage",
+    "method": "GET",
+    "ret": "txt",
+    "paytoqs": "query",
+    "url": "",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "insecureHTTPParser": false,
+    "authType": "",
+    "senderr": false,
+    "headers": [],
+    "x": 380,
+    "y": 680,
+    "wires": [
+      [
+        "2b55afcd6ea37063"
+      ]
+    ]
+  },
+  {
+    "id": "2b55afcd6ea37063",
+    "type": "file",
+    "z": "rag-index-flow",
+    "g": "79059eb6ac8ef628",
+    "name": "",
+    "filename": "fileName",
+    "filenameType": "msg",
+    "appendNewline": true,
+    "createDir": false,
+    "overwriteFile": "true",
+    "encoding": "none",
+    "x": 540,
+    "y": 680,
+    "wires": [
+      [
+        "484eb220f3f11b1b"
+      ]
+    ]
+  },
+  {
+    "id": "e73a2280c7d040b0",
+    "type": "global-config",
+    "env": [],
+    "modules": {
+      "node-red-contrib-loop-processing": "0.5.1"
+    }
+  }
+]

@@ -1,0 +1,224 @@
+[
+  {
+    "id": "64026e17420ba8cb",
+    "type": "group",
+    "z": "rag-index-flow",
+    "name": "RAG - use vector database",
+    "style": {
+      "label": true
+    },
+    "nodes": [
+      "527e5f5cc0555073",
+      "3fce3340dffc2c89",
+      "f7386940768a2a96",
+      "60f9e796cbed9a96",
+      "e30e44b999898f7f",
+      "a4425d875d3387d0",
+      "ff66f2a5349a2a1b",
+      "9f495184b5f67b02"
+    ],
+    "x": 54,
+    "y": 239,
+    "w": 1152,
+    "h": 162
+  },
+  {
+    "id": "527e5f5cc0555073",
+    "type": "inject",
+    "z": "rag-index-flow",
+    "g": "64026e17420ba8cb",
+    "name": "Ask Question",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "Who is Threepio?",
+    "payloadType": "str",
+    "x": 170,
+    "y": 280,
+    "wires": [
+      [
+        "3fce3340dffc2c89"
+      ]
+    ]
+  },
+  {
+    "id": "3fce3340dffc2c89",
+    "type": "change",
+    "z": "rag-index-flow",
+    "g": "64026e17420ba8cb",
+    "name": "Save Question",
+    "rules": [
+      {
+        "t": "set",
+        "p": "originalQuestion",
+        "pt": "msg",
+        "to": "payload",
+        "tot": "msg"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 300,
+    "y": 320,
+    "wires": [
+      [
+        "f7386940768a2a96"
+      ]
+    ]
+  },
+  {
+    "id": "f7386940768a2a96",
+    "type": "ollama-emb",
+    "z": "rag-index-flow",
+    "g": "64026e17420ba8cb",
+    "name": "Generate Embedding",
+    "baseUrl": "http://localhost:11434",
+    "model": "mxbai-embed-large",
+    "x": 460,
+    "y": 280,
+    "wires": [
+      [
+        "60f9e796cbed9a96"
+      ]
+    ]
+  },
+  {
+    "id": "60f9e796cbed9a96",
+    "type": "faiss-store",
+    "z": "rag-index-flow",
+    "g": "64026e17420ba8cb",
+    "name": "Search FAISS",
+    "operation": "search",
+    "persistPath": "./faiss_index",
+    "x": 620,
+    "y": 320,
+    "wires": [
+      [
+        "e30e44b999898f7f",
+        "a4425d875d3387d0"
+      ]
+    ]
+  },
+  {
+    "id": "e30e44b999898f7f",
+    "type": "debug",
+    "z": "rag-index-flow",
+    "g": "64026e17420ba8cb",
+    "name": "Search Results",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 760,
+    "y": 360,
+    "wires": []
+  },
+  {
+    "id": "a4425d875d3387d0",
+    "type": "change",
+    "z": "rag-index-flow",
+    "g": "64026e17420ba8cb",
+    "name": "Build Context",
+    "rules": [
+      {
+        "t": "set",
+        "p": "retrievedChunks",
+        "pt": "msg",
+        "to": "payload",
+        "tot": "msg"
+      },
+      {
+        "t": "set",
+        "p": "template",
+        "pt": "msg",
+        "to": "\"You are a Star Wars Movie Script Expert. Use ONLY the following script excerpts to answer.\\nIf the answer isn't in the context, say \\\"There is no information about this in the original Star Wars scripts.\\\"\\n\\nContext:\\n{context}\\n\\nQuestion:\\n{question}\\n\\nAnswer:\"",
+        "tot": "str"
+      },
+      {
+        "t": "set",
+        "p": "context",
+        "pt": "msg",
+        "to": "$join($map(payload, function($v) { $v.pageContent }), '\\n\\n')",
+        "tot": "jsonata"
+      },
+      {
+        "t": "set",
+        "p": "question",
+        "pt": "msg",
+        "to": "originalQuestion",
+        "tot": "msg"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 750,
+    "y": 280,
+    "wires": [
+      [
+        "ff66f2a5349a2a1b"
+      ]
+    ]
+  },
+  {
+    "id": "ff66f2a5349a2a1b",
+    "type": "ollama-chat",
+    "z": "rag-index-flow",
+    "g": "64026e17420ba8cb",
+    "name": "Chat Ollama",
+    "baseUrl": "http://localhost:11434",
+    "modelName": "qwen2.5:7b",
+    "temperature": 0,
+    "x": 950,
+    "y": 320,
+    "wires": [
+      [
+        "9f495184b5f67b02"
+      ]
+    ]
+  },
+  {
+    "id": "9f495184b5f67b02",
+    "type": "debug",
+    "z": "rag-index-flow",
+    "g": "64026e17420ba8cb",
+    "name": "Answer",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 1100,
+    "y": 320,
+    "wires": []
+  },
+  {
+    "id": "ce8a2f6691161ce8",
+    "type": "global-config",
+    "env": [],
+    "modules": {
+      "node-red-contrib-ollama-embeddings": "1.0.0",
+      "node-red-contrib-faiss": "1.0.0",
+      "node-red-contrib-ollama-chat": "1.0.0"
+    }
+  }
+]
