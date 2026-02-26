@@ -1,0 +1,28 @@
+{
+    "name": "node-red-contrib-sqlite-vec",
+    "version": "1.0.0",
+    "description": "Node-RED node for local vector search using SQLite and sqlite-vec",
+    "main": "sqlite-vec.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "node-red",
+        "sqlite",
+        "sqlite-vec",
+        "vector-search",
+        "embeddings",
+        "rag"
+    ],
+    "author": "4arturas",
+    "license": "MIT",
+    "node-red": {
+        "nodes": {
+            "sqlite-vec": "sqlite-vec.js"
+        }
+    },
+    "dependencies": {
+        "better-sqlite3": "^11.5.0",
+        "sqlite-vec": "^0.1.0"
+    }
+}

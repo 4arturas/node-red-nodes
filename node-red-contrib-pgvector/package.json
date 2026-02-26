@@ -1,0 +1,16 @@
+{
+  "name": "node-red-contrib-pgvector",
+  "version": "1.0.0",
+  "description": "PostgreSQL pgvector store for Node-RED",
+  "main": "pgvector.js",
+  "node-red": {
+    "nodes": {
+      "pgvector": "pgvector.js"
+    }
+  },
+  "dependencies": {
+    "@langchain/community": "^0.3.0",
+    "@langchain/core": "^0.3.0",
+    "pg": "^8.11.0"
+  }
+}

@@ -1,0 +1,78 @@
+<script type="text/javascript">
+    RED.nodes.registerType('sqlite-vec', {
+        category: 'rag',
+        color: '#a6bbcf',
+        defaults: {
+            name: { value: "" },
+            dbPath: { value: "vector.db", required: true },
+            operation: { value: "query" },
+            sql: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-database",
+        label: function () {
+            return this.name || "sqlite-vec";
+        },
+        labelStyle: function () {
+            return this.name ? "node_label_italic" : "";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="sqlite-vec">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-dbPath"><i class="fa fa-file"></i> DB Path</label>
+        <input type="text" id="node-input-dbPath" placeholder="vector.db">
+    </div>
+    <div class="form-row">
+        <label for="node-input-operation"><i class="fa fa-cog"></i> Operation</label>
+        <select id="node-input-operation" style="width: 70%;">
+            <option value="query">Query (Select)</option>
+            <option value="execute">Execute (Insert/Update/Create)</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-sql"><i class="fa fa-code"></i> SQL</label>
+        <textarea id="node-input-sql" style="width: 70%; height: 100px;" placeholder="SELECT ..."></textarea>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="sqlite-vec">
+    <p>A Node-RED node for local vector search using SQLite and the <code>sqlite-vec</code> extension.</p>
+    
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>msg.topic <span class="property-type">string</span></dt>
+        <dd>Optional SQL query. Overrides the SQL configured in the node.</dd>
+        <dt>msg.payload <span class="property-type">array|object</span></dt>
+        <dd>Parameters for the SQL query. Use <code>?</code> for positional or <code>:name</code> for named parameters.</dd>
+    </dl>
+    
+    <h3>Operations</h3>
+    <dl class="message-properties">
+        <dt>Query</dt>
+        <dd>Returns an array of results in <code>msg.payload</code>. Best for <code>SELECT</code> statements.</dd>
+        <dt>Execute</dt>
+        <dd>Returns execution info (like <code>changes</code>, <code>lastInsertRowid</code>) in <code>msg.payload</code>. Best for <code>INSERT</code>, <code>UPDATE</code>, or <code>CREATE</code>.</dd>
+    </dl>
+    
+    <h3>Vector Search Example</h3>
+    <p>1. Create a vector table:</p>
+    <pre>CREATE VIRTUAL TABLE vec_items USING vec0(embedding float[3]);</pre>
+    
+    <p>2. Insert a vector:</p>
+    <pre>INSERT INTO vec_items(rowid, embedding) VALUES (1, ?);</pre>
+    
+    <p>3. Perform KNN search:</p>
+    <pre>SELECT rowid, distance FROM vec_items WHERE embedding MATCH vec_f32(?) AND k = 5;</pre>
+    
+    <h3>References</h3>
+    <ul>
+        <li><a href="https://github.com/asg017/sqlite-vec">sqlite-vec GitHub</a> - Extension documentation and examples.</li>
+    </ul>
+</script>

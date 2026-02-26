@@ -1,0 +1,219 @@
+[
+    {
+        "id": "init_text_db",
+        "type": "inject",
+        "z": "text_search_tab",
+        "name": "1. Setup Tables",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 450,
+        "y": 120,
+        "wires": [
+            [
+                "create_docs_table"
+            ]
+        ]
+    },
+    {
+        "id": "create_docs_table",
+        "type": "sqlite-vec",
+        "z": "text_search_tab",
+        "name": "Create Tables",
+        "dbPath": "text_search.db",
+        "operation": "execute",
+        "sql": "CREATE TABLE IF NOT EXISTS documents (id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT);\nCREATE VIRTUAL TABLE IF NOT EXISTS vec_documents USING vec0(embedding float[1024]);",
+        "x": 660,
+        "y": 120,
+        "wires": [
+            [
+                "debug_text"
+            ]
+        ]
+    },
+    {
+        "id": "index_text",
+        "type": "inject",
+        "z": "text_search_tab",
+        "name": "2. Index: 'The capital of Germany is Berlin'",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "content",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "The capital of Germany is Berlin",
+        "payloadType": "str",
+        "x": 510,
+        "y": 200,
+        "wires": [
+            [
+                "save_content"
+            ]
+        ]
+    },
+    {
+        "id": "save_content",
+        "type": "sqlite-vec",
+        "z": "text_search_tab",
+        "name": "Save Text",
+        "dbPath": "text_search.db",
+        "operation": "execute",
+        "sql": "INSERT INTO documents(content) VALUES (?);",
+        "x": 770,
+        "y": 200,
+        "wires": [
+            [
+                "prep_embed"
+            ]
+        ]
+    },
+    {
+        "id": "prep_embed",
+        "type": "function",
+        "z": "text_search_tab",
+        "name": "Store ID & Text",
+        "func": "// Store the ID and original text to use after embedding\nmsg.docId = msg.payload.lastInsertRowid;\n// The original text was preserved in msg.content\nmsg.payload = msg.content;\nreturn msg;",
+        "outputs": 1,
+        "x": 940,
+        "y": 200,
+        "wires": [
+            [
+                "ollama_embed"
+            ]
+        ]
+    },
+    {
+        "id": "ollama_embed",
+        "type": "ollama-emb",
+        "z": "text_search_tab",
+        "name": "Embed",
+        "baseUrl": "http://localhost:11434",
+        "model": "mxbai-embed-large",
+        "x": 1110,
+        "y": 200,
+        "wires": [
+            [
+                "prep_save_vector"
+            ]
+        ]
+    },
+    {
+        "id": "prep_save_vector",
+        "type": "function",
+        "z": "text_search_tab",
+        "name": "Prep Save Vector",
+        "func": "// Combine the ID and the embedding for the Save Vector node\nmsg.payload = [msg.docId, msg.payload];\nreturn msg;",
+        "outputs": 1,
+        "x": 1200,
+        "y": 200,
+        "wires": [
+            [
+                "save_vector"
+            ]
+        ]
+    },
+    {
+        "id": "save_vector",
+        "type": "sqlite-vec",
+        "z": "text_search_tab",
+        "name": "Save Vector",
+        "dbPath": "text_search.db",
+        "operation": "execute",
+        "sql": "INSERT INTO vec_documents(rowid, embedding) VALUES (?, vec_f32(?));",
+        "x": 1400,
+        "y": 200,
+        "wires": [
+            [
+                "debug_text"
+            ]
+        ]
+    },
+    {
+        "id": "search_text",
+        "type": "inject",
+        "z": "text_search_tab",
+        "name": "3. Search: 'Berlin'",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "Berlin",
+        "payloadType": "str",
+        "x": 470,
+        "y": 280,
+        "wires": [
+            [
+                "ollama_embed_query"
+            ]
+        ]
+    },
+    {
+        "id": "ollama_embed_query",
+        "type": "ollama-emb",
+        "z": "text_search_tab",
+        "name": "Embed Query",
+        "baseUrl": "http://localhost:11434",
+        "model": "mxbai-embed-large",
+        "x": 670,
+        "y": 280,
+        "wires": [
+            [
+                "semantic_search"
+            ]
+        ]
+    },
+    {
+        "id": "semantic_search",
+        "type": "sqlite-vec",
+        "z": "text_search_tab",
+        "name": "Search",
+        "dbPath": "text_search.db",
+        "operation": "query",
+        "sql": "SELECT d.content, v.distance \nFROM documents d \nJOIN vec_documents v ON d.id = v.rowid \nWHERE v.embedding MATCH vec_f32(?) \nAND k = 3 \nORDER BY v.distance;",
+        "x": 850,
+        "y": 280,
+        "wires": [
+            [
+                "debug_text"
+            ]
+        ]
+    },
+    {
+        "id": "debug_text",
+        "type": "debug",
+        "z": "text_search_tab",
+        "name": "Output",
+        "active": true,
+        "tosidebar": true,
+        "x": 1100,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "e25b9e099d1da2a8",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-sqlite-vec": "1.0.0",
+            "node-red-contrib-ollama-embeddings": "1.0.0"
+        }
+    }
+]

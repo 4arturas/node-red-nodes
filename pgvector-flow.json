@@ -1,0 +1,99 @@
+[
+  {
+    "id": "a4f88b0beb90945c",
+    "type": "inject",
+    "z": "7537feee273b8d5e",
+    "name": "Add Data",
+    "props": [
+      { "p": "payload", "v": "The capital of Lithuania is Vilnius.", "vt": "str" },
+      { "p": "embeddings", "v": "{}", "vt": "json" }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "x": 140,
+    "y": 200,
+    "wires": [["helper_emb"]]
+  },
+  {
+    "id": "search_inject",
+    "type": "inject",
+    "z": "7537feee273b8d5e",
+    "name": "Search Data",
+    "props": [
+      { "p": "payload", "v": "What is the capital of Lithuania?", "vt": "str" },
+      { "p": "embeddings", "v": "{}", "vt": "json" }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "x": 130,
+    "y": 300,
+    "wires": [["helper_emb_search"]]
+  },
+  {
+    "id": "helper_emb",
+    "type": "function",
+    "z": "7537feee273b8d5e",
+    "name": "Mock Embeddings Object",
+    "func": "/* In a real flow, replace this with an Ollama/OpenAI node */\nmsg.embeddings = {\n    embedQuery: async (text) => Array(1536).fill(Math.random()),\n    embedDocuments: async (texts) => texts.map(() => Array(1536).fill(Math.random()))\n};\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 380,
+    "y": 200,
+    "wires": [["7fe5e6b325407e07"]]
+  },
+  {
+    "id": "helper_emb_search",
+    "type": "function",
+    "z": "7537feee273b8d5e",
+    "name": "Mock Embeddings Object",
+    "func": "msg.embeddings = {\n    embedQuery: async (text) => Array(1536).fill(0.1),\n    embedDocuments: async (texts) => texts.map(() => Array(1536).fill(0.1))\n};\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 380,
+    "y": 300,
+    "wires": [["search_node"]]
+  },
+  {
+    "id": "7fe5e6b325407e07",
+    "type": "pgvector",
+    "z": "7537feee273b8d5e",
+    "name": "pgvector Add",
+    "operation": "add",
+    "tableName": "langchain_embeddings",
+    "x": 620,
+    "y": 200,
+    "wires": [["544ab7c61370850e"]]
+  },
+  {
+    "id": "search_node",
+    "type": "pgvector",
+    "z": "7537feee273b8d5e",
+    "name": "pgvector Search",
+    "operation": "search",
+    "tableName": "langchain_embeddings",
+    "k": "3",
+    "x": 620,
+    "y": 300,
+    "wires": [["544ab7c61370850e"]]
+  },
+  {
+    "id": "544ab7c61370850e",
+    "type": "debug",
+    "z": "7537feee273b8d5e",
+    "name": "Results",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "x": 820,
+    "y": 260,
+    "wires": []
+  }
+]
