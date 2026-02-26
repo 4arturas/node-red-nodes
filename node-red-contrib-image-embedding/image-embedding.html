@@ -1,0 +1,57 @@
+<script type="text/javascript">
+    RED.nodes.registerType('image-embedding', {
+        category: 'rag',
+        color: '#E2D96E',
+        defaults: {
+            name: { value: "" },
+            model: { value: "Xenova/clip-vit-base-patch32" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-image",
+        label: function () {
+            return this.name || "image-embedding";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="image-embedding">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-model"><i class="fa fa-cube"></i> Model</label>
+        <select id="node-input-model">
+            <option value="Xenova/clip-vit-base-patch32">CLIP ViT-B/32 (Balanced)</option>
+            <option value="Xenova/clip-vit-base-patch16">CLIP ViT-B/16 (Higher Accuracy)</option>
+            <option value="Xenova/vit-base-patch16-224">ViT Base (Image Only)</option>
+        </select>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="image-embedding">
+    <p>Generates vector embeddings for <b>multimodal</b> search (images and text) using CLIP models.</p>
+    <p>This node automatically detects if the input is text or an image and maps them into a shared vector space, allowing you to search for images using text queries.</p>
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>payload
+            <span class="property-type">Buffer | string</span>
+        </dt>
+        <dd>
+            <ul>
+                <li><b>Text</b>: Any string not starting with "http" or "data:".</li>
+                <li><b>Image URL</b>: A string starting with "http".</li>
+                <li><b>Data URL</b>: A string starting with "data:image/".</li>
+                <li><b>Image Buffer</b>: A raw image Buffer (e.g., from a 'file in' node).</li>
+            </ul>
+        </dd>
+    </dl>
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>payload
+            <span class="property-type">Array</span>
+        </dt>
+        <dd>The resulting vector embedding as an array of numbers (CLIP embedding).</dd>
+    </dl>
+</script>

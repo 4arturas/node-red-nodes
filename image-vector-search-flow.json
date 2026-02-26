@@ -1,0 +1,302 @@
+[
+    {
+        "id": "image_search_tab",
+        "type": "tab",
+        "label": "Image Vector Search",
+        "disabled": false,
+        "info": "This flow demonstrates Image Vector Search using CLIP embeddings and SQLite-vec."
+    },
+    {
+        "id": "init_db",
+        "type": "inject",
+        "z": "image_search_tab",
+        "name": "Initialize DB",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "CREATE VIRTUAL TABLE IF NOT EXISTS image_embeddings USING vec0(id INTEGER PRIMARY KEY, embedding FLOAT[512], filename TEXT);",
+        "x": 130,
+        "y": 80,
+        "wires": [
+            [
+                "sqlite_init"
+            ]
+        ]
+    },
+    {
+        "id": "sqlite_init",
+        "type": "sqlite-vec",
+        "z": "image_search_tab",
+        "name": "SQLite Init",
+        "dbPath": "images_vector.db",
+        "operation": "execute",
+        "sql": "",
+        "x": 330,
+        "y": 80,
+        "wires": [
+            [
+                "debug_results"
+            ]
+        ]
+    },
+    {
+        "id": "index_cat",
+        "type": "inject",
+        "z": "image_search_tab",
+        "name": "Index Cat",
+        "props": [
+            {
+                "p": "filename",
+                "v": "cat.png",
+                "vt": "str"
+            },
+            {
+                "p": "filepath",
+                "v": "c:\\Users\\4artu\\IdeaProjects\\node-red-nodes\\tutorial_images\\cat.png",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 160,
+        "wires": [
+            [
+                "read_image"
+            ]
+        ]
+    },
+    {
+        "id": "index_dog",
+        "type": "inject",
+        "z": "image_search_tab",
+        "name": "Index Dog",
+        "props": [
+            {
+                "p": "filename",
+                "v": "dog.png",
+                "vt": "str"
+            },
+            {
+                "p": "filepath",
+                "v": "c:\\Users\\4artu\\IdeaProjects\\node-red-nodes\\tutorial_images\\dog.png",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 200,
+        "wires": [
+            [
+                "read_image"
+            ]
+        ]
+    },
+    {
+        "id": "index_pizza",
+        "type": "inject",
+        "z": "image_search_tab",
+        "name": "Index Pizza",
+        "props": [
+            {
+                "p": "filename",
+                "v": "pizza.png",
+                "vt": "str"
+            },
+            {
+                "p": "filepath",
+                "v": "c:\\Users\\4artu\\IdeaProjects\\node-red-nodes\\tutorial_images\\pizza.png",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 240,
+        "wires": [
+            [
+                "read_image"
+            ]
+        ]
+    },
+    {
+        "id": "read_image",
+        "type": "file in",
+        "z": "image_search_tab",
+        "name": "Read Image",
+        "filename": "filepath",
+        "filenameType": "msg",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 310,
+        "y": 200,
+        "wires": [
+            [
+                "embed_image"
+            ]
+        ]
+    },
+    {
+        "id": "embed_image",
+        "type": "image-embedding",
+        "z": "image_search_tab",
+        "name": "Embed Image",
+        "model": "Xenova/clip-vit-base-patch32",
+        "x": 500,
+        "y": 200,
+        "wires": [
+            [
+                "prep_insert"
+            ]
+        ]
+    },
+    {
+        "id": "prep_insert",
+        "type": "function",
+        "z": "image_search_tab",
+        "name": "Prep Insert",
+        "func": "msg.topic = \"INSERT INTO image_embeddings(embedding, filename) VALUES (?, ?);\";\nmsg.params = [msg.payload, msg.filename];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 200,
+        "wires": [
+            [
+                "sqlite_insert"
+            ]
+        ]
+    },
+    {
+        "id": "sqlite_insert",
+        "type": "sqlite-vec",
+        "z": "image_search_tab",
+        "name": "SQLite Insert",
+        "dbPath": "images_vector.db",
+        "operation": "execute",
+        "sql": "",
+        "x": 840,
+        "y": 200,
+        "wires": [
+            [
+                "debug_results"
+            ]
+        ]
+    },
+    {
+        "id": "search_image_inject",
+        "type": "inject",
+        "z": "image_search_tab",
+        "name": "Search by Image (Cat URL)",
+        "props": [
+            {
+                "p": "payload",
+                "v": "https://upload.wikimedia.org/wikipedia/commons/3/3a/Cat03.jpg",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 160,
+        "y": 360,
+        "wires": [
+            [
+                "embed_search"
+            ]
+        ]
+    },
+    {
+        "id": "embed_search",
+        "type": "image-embedding",
+        "z": "image_search_tab",
+        "name": "Embed Search",
+        "model": "Xenova/clip-vit-base-patch32",
+        "x": 380,
+        "y": 360,
+        "wires": [
+            [
+                "prep_search"
+            ]
+        ]
+    },
+    {
+        "id": "prep_search",
+        "type": "function",
+        "z": "image_search_tab",
+        "name": "Prep Search",
+        "func": "msg.topic = \"SELECT filename, distance FROM image_embeddings WHERE embedding MATCH ? AND k = 1 ORDER BY distance;\";\nmsg.params = [msg.payload];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 360,
+        "wires": [
+            [
+                "sqlite_search"
+            ]
+        ]
+    },
+    {
+        "id": "sqlite_search",
+        "type": "sqlite-vec",
+        "z": "image_search_tab",
+        "name": "SQLite Search",
+        "dbPath": "images_vector.db",
+        "operation": "query",
+        "sql": "",
+        "x": 720,
+        "y": 360,
+        "wires": [
+            [
+                "debug_results"
+            ]
+        ]
+    },
+    {
+        "id": "debug_results",
+        "type": "debug",
+        "z": "image_search_tab",
+        "name": "Debug",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 930,
+        "y": 80,
+        "wires": []
+    }
+]

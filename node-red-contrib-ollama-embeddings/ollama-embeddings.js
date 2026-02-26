@@ -70,6 +70,14 @@ module.exports = function (RED) {
                     const embedding = await embeddings.embedQuery(textToEmbed);
                     msg.payload = embedding;
                     msg.embeddingDimension = embedding.length;
+
+                    // Always provide documents array for downstream nodes (like pgvector/faiss)
+                    msg.documents = [{
+                        pageContent: textToEmbed,
+                        metadata: msg.metadata || {},
+                        embedding: embedding
+                    }];
+
                     node.status({ fill: "green", shape: "dot", text: `embedded (${embedding.length} dims)` });
                 }
 
