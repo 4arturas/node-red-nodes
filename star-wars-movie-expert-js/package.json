@@ -25,6 +25,8 @@
     "@langchain/textsplitters": "^0.1.0",
     "cheerio": "^1.0.0-rc.12",
     "dotenv": "^16.4.5",
-    "faiss-node": "^0.5.1"
+    "faiss-node": "^0.5.1",
+    "better-sqlite3": "^11.0.0",
+    "sqlite-vec": "^0.1.0"
   }
 }
